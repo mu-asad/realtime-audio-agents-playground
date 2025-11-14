@@ -1,0 +1,23 @@
+[project]
+name = "azure-realtime-audio-playground"
+version = "0.1.0"
+description = "A sandbox for experimenting with live audio and Azure Realtime"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "websockets>=12.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+audio = [
+    "pyaudio>=0.2.14",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
