@@ -27,20 +27,20 @@ load_dotenv()
 def load_system_prompt(prompt_file: str = "prompts/comedian.txt") -> str:
     """
     Load system prompt from file.
-    
+
     Args:
         prompt_file: Path to prompt file relative to repo root
-        
+
     Returns:
         System prompt text
     """
     repo_root = Path(__file__).parent
     prompt_path = repo_root / prompt_file
-    
+
     if not prompt_path.exists():
         print(f"{Fore.YELLOW}Warning: Prompt file not found at {prompt_path}{Style.RESET_ALL}")
         return "You are a helpful assistant."
-    
+
     try:
         with open(prompt_path, "r", encoding="utf-8") as f:
             return f.read().strip()
@@ -52,7 +52,7 @@ def load_system_prompt(prompt_file: str = "prompts/comedian.txt") -> str:
 def print_transcript(role: str, text: str):
     """
     Print transcript with color coding.
-    
+
     Args:
         role: 'user' or 'assistant'
         text: Transcript text
@@ -72,19 +72,19 @@ def validate_config():
         "AZURE_OPENAI_API_KEY",
         "AZURE_OPENAI_DEPLOYMENT",
     ]
-    
+
     missing = []
     for var in required_vars:
         if not os.getenv(var):
             missing.append(var)
-    
+
     if missing:
         print(f"{Fore.RED}Error: Missing required environment variables:{Style.RESET_ALL}")
         for var in missing:
             print(f"  - {var}")
         print(f"\n{Fore.YELLOW}Please set these in your .env file{Style.RESET_ALL}")
         return False
-    
+
     return True
 
 
@@ -93,15 +93,15 @@ async def main():
     print(f"{Fore.CYAN}{'='*60}{Style.RESET_ALL}")
     print(f"{Fore.CYAN}Azure GPT Realtime Voice Chat{Style.RESET_ALL}")
     print(f"{Fore.CYAN}{'='*60}{Style.RESET_ALL}\n")
-    
+
     # Validate configuration
     if not validate_config():
         sys.exit(1)
-    
+
     # Load system prompt
     system_prompt = load_system_prompt()
     print(f"{Fore.YELLOW}System prompt loaded from prompts/comedian.txt{Style.RESET_ALL}\n")
-    
+
     # Build configuration
     config = {
         "endpoint": os.getenv("AZURE_OPENAI_ENDPOINT"),
@@ -111,29 +111,32 @@ async def main():
         "sample_rate": int(os.getenv("VOICE_CLIENT_SAMPLE_RATE", "16000")),
         "system_prompt": system_prompt,
     }
-    
+
     # Optional device index
     device_index_str = os.getenv("VOICE_CLIENT_DEVICE_INDEX")
     if device_index_str:
         try:
             config["device_index"] = int(device_index_str)
         except ValueError:
-            print(f"{Fore.YELLOW}Warning: Invalid VOICE_CLIENT_DEVICE_INDEX, using default{Style.RESET_ALL}")
-    
+            print(
+                f"{Fore.YELLOW}Warning: Invalid VOICE_CLIENT_DEVICE_INDEX, "
+                f"using default{Style.RESET_ALL}"
+            )
+
     # Create client
     client = RealtimeVoiceClient(config)
     client.set_transcript_callback(print_transcript)
-    
+
     # Handle graceful shutdown
     def signal_handler(sig, frame):
         print(f"\n{Fore.YELLOW}Shutting down...{Style.RESET_ALL}")
         asyncio.create_task(client.stop())
-    
+
     signal.signal(signal.SIGINT, signal_handler)
-    
+
     print(f"{Fore.GREEN}Starting voice session...{Style.RESET_ALL}")
     print(f"{Fore.GREEN}Speak into your microphone. Press Ctrl+C to exit.{Style.RESET_ALL}\n")
-    
+
     # Start the client
     try:
         await client.start()
@@ -142,6 +145,7 @@ async def main():
     except Exception as e:
         print(f"{Fore.RED}Error: {e}{Style.RESET_ALL}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 
