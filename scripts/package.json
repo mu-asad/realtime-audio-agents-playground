@@ -1,0 +1,13 @@
+{
+  "name": "calendar-scripts",
+  "version": "1.0.0",
+  "description": "Helper scripts for Google Calendar setup",
+  "type": "module",
+  "scripts": {
+    "get-token": "node get-refresh-token.js"
+  },
+  "dependencies": {
+    "googleapis": "^134.0.0",
+    "dotenv": "^16.4.0"
+  }
+}
