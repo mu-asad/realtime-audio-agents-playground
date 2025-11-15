@@ -11,7 +11,6 @@ This script verifies:
 """
 
 import sys
-import subprocess
 from pathlib import Path
 
 
@@ -61,7 +60,6 @@ def check_node_dependencies():
         # Check for key packages
         key_packages = ["@modelcontextprotocol/sdk", "googleapis", "dotenv"]
         for package in key_packages:
-            package_dir = node_modules / package.replace("/", "/")
             if (node_modules / package.split("/")[0]).exists():
                 print(f"  ✓ {package} installed")
             else:
@@ -106,7 +104,7 @@ def check_agent_host():
         from agent_host import CalendarAgentHost
         
         print("  ✓ agent_host module imported successfully")
-        print(f"  ✓ CalendarAgentHost class available")
+        print("  ✓ CalendarAgentHost class available")
         
         # Check if class has expected methods
         expected_methods = [
