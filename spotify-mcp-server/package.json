@@ -1,0 +1,19 @@
+{
+  "name": "spotify-mcp-server",
+  "version": "1.0.0",
+  "description": "Spotify MCP Server for music playback control via MCP protocol",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.5.0",
+    "spotify-web-api-node": "^5.0.2",
+    "dotenv": "^16.4.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
