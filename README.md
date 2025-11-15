@@ -4,6 +4,7 @@ A sandbox for experimenting with live audio (mic → Azure Realtime → audio/te
 
 ## Features
 
+- **Azure Realtime Voice Chat**: Live voice conversations with Azure GPT using your microphone
 - **Azure Realtime Audio Integration**: Connect live audio streams to Azure's realtime services
 - **Google Calendar MCP Integration**: Manage calendar events through the Model Context Protocol (MCP)
 - **Spotify MCP Integration**: Control Spotify playback with natural language commands
@@ -49,6 +50,27 @@ A sandbox for experimenting with live audio (mic → Azure Realtime → audio/te
    cp .env.example .env
    # Edit .env with your credentials
    ```
+
+### Voice Chat Quick Start
+
+Experience live voice conversations with Azure GPT Realtime:
+
+```bash
+python main_voice.py
+```
+
+This will:
+- Connect to Azure GPT Realtime API
+- Capture audio from your microphone
+- Stream responses back to your speakers
+- Display a live color-coded transcript in the console
+
+**Requirements:**
+- Azure OpenAI Realtime API deployment
+- Microphone and speakers/headphones
+- Environment variables configured (see `.env.example`)
+
+See the [Voice Chat](#voice-chat) section below for detailed setup.
 
 ### Google Calendar Integration
 
@@ -116,6 +138,115 @@ If you don't need Spotify functionality:
 2. Skip the Spotify setup steps
 3. The project will work without it
 
+## Voice Chat
+
+The voice chat feature provides a simple, console-based interface for real-time voice conversations with Azure GPT.
+
+### Features
+
+- 🎤 **Live Audio Streaming**: Capture audio from your microphone and stream it to Azure GPT Realtime
+- 🔊 **Audio Playback**: Receive and play audio responses from the assistant
+- 📝 **Live Transcript**: See a color-coded transcript of the conversation in real-time
+  - 🟢 Green for user speech
+  - 🔵 Blue for assistant responses
+- 🎭 **Customizable Persona**: Configure different system prompts (default: comedian persona)
+- ⚙️ **Configurable Audio**: Adjust sample rate and audio device settings
+
+### Setup
+
+1. **Azure OpenAI Realtime API Deployment**
+   
+   You need an Azure OpenAI resource with the Realtime API enabled. Deploy a model that supports real-time audio (e.g., `gpt-4o-realtime-preview`).
+
+2. **Configure Environment Variables**
+   
+   Add the following to your `.env` file:
+   ```bash
+   AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
+   AZURE_OPENAI_API_KEY=your-api-key
+   AZURE_OPENAI_DEPLOYMENT=your-realtime-deployment-name
+   AZURE_OPENAI_API_VERSION=2024-10-01-preview
+   
+   # Optional: Audio configuration
+   VOICE_CLIENT_SAMPLE_RATE=16000
+   # VOICE_CLIENT_DEVICE_INDEX=0  # Uncomment to specify a specific audio device
+   ```
+
+3. **Audio Requirements**
+   
+   - **Microphone**: Required for voice input
+   - **Speakers/Headphones**: Required for audio output
+   - **PyAudio**: Should be installed automatically via requirements.txt
+     - On Linux, you may need: `sudo apt-get install portaudio19-dev`
+     - On macOS, you may need: `brew install portaudio`
+     - On Windows, PyAudio should install without additional dependencies
+
+### Usage
+
+Start a voice chat session:
+
+```bash
+python main_voice.py
+```
+
+**What happens:**
+1. The client connects to Azure GPT Realtime API
+2. Your microphone starts capturing audio
+3. The conversation transcript appears in the console
+4. The assistant's responses play through your speakers
+5. Press `Ctrl+C` to end the session
+
+**Example output:**
+```
+============================================================
+Azure GPT Realtime Voice Chat
+============================================================
+
+System prompt loaded from prompts/comedian.txt
+
+Starting voice session...
+Speak into your microphone. Press Ctrl+C to exit.
+
+[USER]: Hello, how are you today?
+[ASSISTANT]: Hey there! I'm doing great, thanks for asking! I'm like a 
+coffee machine - always ready to brew up some conversation. What's on 
+your mind today?
+```
+
+### Customizing the System Prompt
+
+The default system prompt is loaded from `prompts/comedian.txt`, which configures the assistant with a comedian persona.
+
+To customize:
+1. Edit `prompts/comedian.txt` with your desired persona/instructions
+2. Or create a new prompt file and update the code to load it
+
+Example prompts:
+- **Professional Assistant**: Formal, helpful, business-oriented
+- **Teacher**: Patient, educational, encouraging
+- **Comedian** (default): Witty, playful, entertaining
+
+### Troubleshooting
+
+**No audio input/output:**
+- Check that your microphone and speakers are connected and working
+- Verify PyAudio is installed correctly
+- On Linux/macOS, check permissions for microphone access
+- Try specifying a device index with `VOICE_CLIENT_DEVICE_INDEX`
+
+**Connection errors:**
+- Verify your Azure OpenAI endpoint and API key are correct
+- Ensure the deployment name matches your Realtime API deployment
+- Check that the API version is correct (2024-10-01-preview or later)
+
+**List available audio devices:**
+```python
+import pyaudio
+p = pyaudio.PyAudio()
+for i in range(p.get_device_count()):
+    print(f"{i}: {p.get_device_info_by_index(i)['name']}")
+```
+
 ## Project Structure
 
 ```
@@ -133,12 +264,16 @@ azure-realtime-audio-playground/
 │   ├── server.js                 # Spotify MCP implementation
 │   ├── get-refresh-token.js      # Token generation helper
 │   └── package.json              # Node.js dependencies
+├── prompts/                       # System prompts for AI personas
+│   └── comedian.txt              # Comedian persona prompt
 ├── src/                          # Source code
-│   └── agent_host/               # Agent host implementation
-│       ├── calendar_agent.py     # Calendar agent host
-│       ├── spotify_agent.py      # Spotify agent host
-│       └── __init__.py
+│   ├── agent_host/               # Agent host implementation
+│   │   ├── calendar_agent.py     # Calendar agent host
+│   │   ├── spotify_agent.py      # Spotify agent host
+│   │   └── __init__.py
+│   └── realtime_voice_client.py  # Voice client for Azure Realtime API
 ├── .env.example                  # Environment variables template
+├── main_voice.py                 # Voice chat main script
 ├── pyproject.toml               # Python project configuration
 ├── requirements.txt             # Python dependencies
 └── README.md                    # This file
