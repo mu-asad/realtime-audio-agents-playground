@@ -15,9 +15,20 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { google } from "googleapis";
 import dotenv from "dotenv";
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-// Load environment variables
-dotenv.config({ path: "../.env" });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load environment variables - try multiple locations
+dotenv.config({ path: join(__dirname, "../.env") });
+dotenv.config({ path: join(process.cwd(), ".env") });
+
+console.error(`[DEBUG] Working directory: ${process.cwd()}`);
+console.error(`[DEBUG] Server directory: ${__dirname}`);
+console.error(`[DEBUG] GOOGLE_CLIENT_ID set: ${!!process.env.GOOGLE_CLIENT_ID}`);
+console.error(`[DEBUG] GOOGLE_REFRESH_TOKEN set: ${!!process.env.GOOGLE_REFRESH_TOKEN}`);
 
 // Initialize OAuth2 client
 const oauth2Client = new google.auth.OAuth2(
@@ -464,6 +475,7 @@ async function main() {
 
   // Handle list tools request
   server.setRequestHandler(ListToolsRequestSchema, async () => {
+    console.error("[DEBUG] Received list_tools request");
     return {
       tools: TOOLS,
     };
@@ -471,6 +483,7 @@ async function main() {
 
   // Handle tool execution
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    console.error(`[DEBUG] Received call_tool request: ${request.params.name}`);
     const { name, arguments: args } = request.params;
 
     try {
@@ -505,7 +518,9 @@ async function main() {
   });
 
   // Start server with stdio transport
+  console.error("[DEBUG] Creating StdioServerTransport...");
   const transport = new StdioServerTransport();
+  console.error("[DEBUG] Connecting server to transport...");
   await server.connect(transport);
 
   console.error("Google Calendar MCP Server running on stdio");

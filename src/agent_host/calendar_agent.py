@@ -7,7 +7,6 @@ and exposes calendar tools for use by the AI assistant.
 
 import asyncio
 import json
-import os
 import sys
 from typing import Any, Dict, List, Optional
 
@@ -30,47 +29,109 @@ class CalendarAgentHost:
     def __init__(self):
         self.session: Optional[ClientSession] = None
         self.available_tools: List[Dict[str, Any]] = []
+        # store the async context manager returned by stdio_client so we can exit it later
+        self._stdio_cm = None
 
     async def connect_to_mcp_server(self):
         """Connect to the Google Calendar MCP server."""
+        # Get the path to the MCP server directory
+        import pathlib
+        repo_root = pathlib.Path(__file__).parent.parent.parent
+        mcp_server_dir = repo_root / "mcp-server"
+        server_script = mcp_server_dir / "server.js"
+
+        if not server_script.exists():
+            raise FileNotFoundError(f"MCP server script not found: {server_script}")
+
         # Define server parameters
+        # Note: Environment variables should already be loaded by the .env file
         server_params = StdioServerParameters(
             command="node",
-            args=["mcp-server/server.js"],
-            env={
-                **os.environ,
-                "GOOGLE_CLIENT_ID": os.getenv("GOOGLE_CLIENT_ID", ""),
-                "GOOGLE_CLIENT_SECRET": os.getenv("GOOGLE_CLIENT_SECRET", ""),
-                "GOOGLE_REFRESH_TOKEN": os.getenv("GOOGLE_REFRESH_TOKEN", ""),
-                "GOOGLE_CALENDAR_ID": os.getenv("GOOGLE_CALENDAR_ID", "primary"),
-            },
+            args=[str(server_script)],
         )
 
-        # Connect to the server
-        stdio_transport = await stdio_client(server_params)
-        self.read, self.write = stdio_transport
-        self.session = ClientSession(self.read, self.write)
+        # Use async context manager properly
+        print("Starting MCP server process...")
+        # Store the context manager so we can exit it in close()
+        self._stdio_cm = stdio_client(server_params)
 
-        # Initialize the session
-        await self.session.initialize()
+        # Enter the context manager to get the read/write streams
+        try:
+            read_stream, write_stream = await self._stdio_cm.__aenter__()
+        except Exception as e:
+            print(f"Error starting MCP server: {e}")
+            raise
+
+        self.read = read_stream
+        self.write = write_stream
+        print("MCP server process started")
+
+        # Give the server a moment to initialize
+        await asyncio.sleep(0.5)
+
+        # Create the MCP client session using the obtained transport
+        self.session = ClientSession(self.read, self.write)
+        print("Client session created")
+
+        # Enter the session context manager
+        try:
+            await self.session.__aenter__()
+            print("Session context entered")
+        except Exception as e:
+            print(f"Error entering session context: {e}")
+            raise
+
+        # Initialize the session with timeout
+        print("Initializing session...")
+        try:
+            init_result = await asyncio.wait_for(self.session.initialize(), timeout=30.0)
+            print(f"Session initialized successfully: {init_result}")
+        except asyncio.TimeoutError as e:
+            print(f"Timeout error during initialization")
+            raise RuntimeError(
+                "Timeout while initializing MCP session. "
+                "The MCP server may not be responding. Check that:\n"
+                "1. Node.js is installed and accessible\n"
+                "2. MCP server dependencies are installed (run 'npm install' in mcp-server/)\n"
+                "3. Google credentials are valid in .env file"
+            ) from e
+        except Exception as e:
+            print(f"Error during initialization: {e}")
+            raise
 
         # List available tools
-        tools_result = await self.session.list_tools()
-        self.available_tools = tools_result.tools
+        print("Listing available tools...")
+        try:
+            tools_result = await asyncio.wait_for(self.session.list_tools(), timeout=5.0)
+            self.available_tools = tools_result.tools
+            print(f"Found {len(self.available_tools)} tools")
+        except asyncio.TimeoutError:
+            raise RuntimeError("Timeout while listing tools from MCP server")
 
         print("Connected to Google Calendar MCP server")
         print(f"Available tools: {[tool.name for tool in self.available_tools]}")
 
     async def list_tools(self) -> List[Dict[str, Any]]:
         """List all available calendar tools."""
-        return [
-            {
-                "name": tool.name,
-                "description": tool.description,
-                "input_schema": tool.inputSchema,
-            }
-            for tool in self.available_tools
-        ]
+        tools_list: List[Dict[str, Any]] = []
+        for tool in self.available_tools:
+            # Support both object-like and dict-like tool representations
+            if isinstance(tool, dict):
+                name = tool.get("name") or tool.get("displayName")
+                description = tool.get("description", "")
+                input_schema = tool.get("inputSchema") or tool.get("input_schema")
+            else:
+                name = getattr(tool, "name", None) or getattr(tool, "displayName", None)
+                description = getattr(tool, "description", "")
+                input_schema = getattr(tool, "inputSchema", None) or getattr(tool, "input_schema", None)
+
+            tools_list.append({
+                "name": name,
+                "description": description,
+                "input_schema": input_schema,
+            })
+
+        return tools_list
 
     async def call_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -189,9 +250,29 @@ class CalendarAgentHost:
         return await self.call_tool("get_free_busy", args)
 
     async def close(self):
-        """Close the connection to the MCP server."""
+        """Close the connection to the MCP server and exit any context managers."""
+        # If the session implements __aexit__ (i.e. is an async context manager), exit it.
         if self.session:
-            await self.session.__aexit__(None, None, None)
+            if hasattr(self.session, "__aexit__"):
+                try:
+                    await self.session.__aexit__(None, None, None)
+                except Exception:
+                    # ignore errors during session exit
+                    pass
+            elif hasattr(self.session, "close"):
+                try:
+                    maybe = self.session.close()
+                    if asyncio.iscoroutine(maybe):
+                        await maybe
+                except Exception:
+                    pass
+
+        # Exit the stdio client context manager if we entered it
+        if hasattr(self, "_stdio_cm") and self._stdio_cm:
+            try:
+                await self._stdio_cm.__aexit__(None, None, None)
+            except Exception:
+                pass
 
 
 async def main():
