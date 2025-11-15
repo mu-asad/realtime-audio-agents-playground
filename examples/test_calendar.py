@@ -47,23 +47,24 @@ async def test_calendar_operations():
         print("\n[3/6] Testing list_events...")
         now = datetime.utcnow()
         week_later = now + timedelta(days=7)
-        
+
         events_result = await agent.list_events(
             time_min=now.isoformat() + "Z",
             time_max=week_later.isoformat() + "Z",
             max_results=5,
         )
-        
+
         print(f"  ✓ Found {len(events_result.get('events', []))} events")
         if events_result.get("events"):
             for event in events_result["events"][:3]:
-                print(f"    - {event.get('summary', 'No title')}: {event.get('start', {}).get('dateTime', 'No time')}")
+                event_time = event.get("start", {}).get("dateTime", "No time")
+                print(f"    - {event.get('summary', 'No title')}: {event_time}")
 
         # Test creating an event
         print("\n[4/6] Testing create_event...")
         start_time = (now + timedelta(days=2)).replace(hour=14, minute=0, second=0, microsecond=0)
         end_time = start_time + timedelta(hours=1)
-        
+
         create_result = await agent.create_event(
             summary="MCP Integration Test Meeting",
             start_time=start_time.isoformat() + "Z",
@@ -71,7 +72,7 @@ async def test_calendar_operations():
             description="This is a test event created by the MCP integration test script.",
             location="Virtual Meeting Room",
         )
-        
+
         if "event" in create_result:
             created_event_id = create_result["event"]["id"]
             print(f"  ✓ Created event: {create_result['event']['summary']}")
@@ -96,7 +97,7 @@ async def test_calendar_operations():
                 summary="UPDATED: MCP Integration Test Meeting",
                 description="This event has been updated by the test script.",
             )
-            
+
             if "event" in update_result:
                 print(f"  ✓ Updated event: {update_result['event']['summary']}")
             else:
@@ -108,7 +109,7 @@ async def test_calendar_operations():
             time_min=now.isoformat() + "Z",
             time_max=week_later.isoformat() + "Z",
         )
-        
+
         if "freeBusy" in freebusy_result:
             busy_periods = freebusy_result["freeBusy"].get("busy", [])
             print(f"  ✓ Found {len(busy_periods)} busy periods")
@@ -120,7 +121,7 @@ async def test_calendar_operations():
             print("\n[Cleanup] Deleting test event...")
             delete_result = await agent.delete_event(created_event_id)
             if delete_result.get("success"):
-                print(f"  ✓ Successfully deleted test event")
+                print("  ✓ Successfully deleted test event")
             else:
                 print(f"  ✗ Failed to delete event: {delete_result}")
                 print(f"    Please manually delete event ID: {created_event_id}")
@@ -132,8 +133,9 @@ async def test_calendar_operations():
     except Exception as e:
         print(f"\n✗ Error during testing: {e}")
         import traceback
+
         traceback.print_exc()
-        
+
         # Try to clean up if event was created
         if created_event_id:
             print(f"\nAttempting to clean up test event: {created_event_id}")
@@ -143,7 +145,7 @@ async def test_calendar_operations():
             except Exception as cleanup_error:
                 print(f"✗ Failed to clean up: {cleanup_error}")
                 print(f"Please manually delete event ID: {created_event_id}")
-        
+
         return False
     finally:
         await agent.close()

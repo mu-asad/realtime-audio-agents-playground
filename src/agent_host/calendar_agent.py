@@ -22,7 +22,7 @@ load_dotenv()
 class CalendarAgentHost:
     """
     Agent host that integrates with Google Calendar via MCP.
-    
+
     This class manages the connection to the Google Calendar MCP server
     and provides a clean interface for calendar operations.
     """
@@ -58,7 +58,7 @@ class CalendarAgentHost:
         tools_result = await self.session.list_tools()
         self.available_tools = tools_result.tools
 
-        print(f"Connected to Google Calendar MCP server")
+        print("Connected to Google Calendar MCP server")
         print(f"Available tools: {[tool.name for tool in self.available_tools]}")
 
     async def list_tools(self) -> List[Dict[str, Any]]:
@@ -75,11 +75,11 @@ class CalendarAgentHost:
     async def call_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         """
         Call a calendar tool with the given arguments.
-        
+
         Args:
             tool_name: Name of the tool to call
             arguments: Dictionary of arguments for the tool
-            
+
         Returns:
             Result from the tool execution
         """
@@ -87,13 +87,13 @@ class CalendarAgentHost:
             raise RuntimeError("Not connected to MCP server. Call connect_to_mcp_server() first.")
 
         result = await self.session.call_tool(tool_name, arguments)
-        
+
         # Parse the result
         if result.content:
             content = result.content[0]
-            if hasattr(content, 'text'):
+            if hasattr(content, "text"):
                 return json.loads(content.text)
-        
+
         return {"error": "No result returned"}
 
     async def list_events(
@@ -216,6 +216,7 @@ async def main():
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         import traceback
+
         traceback.print_exc()
     finally:
         await agent.close()
