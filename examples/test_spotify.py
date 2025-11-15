@@ -44,9 +44,9 @@ async def test_spotify_operations():
         try:
             devices_result = await agent.get_devices()
             print(f"✓ {devices_result.get('summary', 'Success')}")
-            if devices_result.get('devices'):
-                for device in devices_result['devices']:
-                    active_indicator = "🔊 ACTIVE" if device['is_active'] else ""
+            if devices_result.get("devices"):
+                for device in devices_result["devices"]:
+                    active_indicator = "🔊 ACTIVE" if device["is_active"] else ""
                     print(f"  - {device['name']} ({device['type']}) {active_indicator}")
             else:
                 print("  ⚠ No devices found. Open Spotify on a device and start playing.")
@@ -58,14 +58,14 @@ async def test_spotify_operations():
         try:
             playback_result = await agent.get_current_playback()
             print(f"✓ {playback_result.get('summary', 'Success')}")
-            if playback_result.get('playing'):
-                track = playback_result['track']
-                device = playback_result['device']
+            if playback_result.get("playing"):
+                track = playback_result["track"]
+                device = playback_result["device"]
                 print(f"  🎵 Track: {track['name']}")
                 print(f"  🎤 Artist: {track['artist']}")
                 print(f"  💿 Album: {track['album']}")
                 print(f"  📱 Device: {device['name']} ({device['type']})")
-            elif not playback_result.get('playing'):
+            elif not playback_result.get("playing"):
                 print("  ℹ No active playback")
         except Exception as e:
             print(f"✗ Error: {e}")
@@ -75,8 +75,8 @@ async def test_spotify_operations():
         try:
             search_result = await agent.search_tracks("lofi hip hop", limit=5)
             print(f"✓ {search_result.get('summary', 'Success')}")
-            if search_result.get('tracks'):
-                for i, track in enumerate(search_result['tracks'][:5], 1):
+            if search_result.get("tracks"):
+                for i, track in enumerate(search_result["tracks"][:5], 1):
                     print(f"  {i}. {track['name']} - {track['artist']}")
         except Exception as e:
             print(f"✗ Error: {e}")
@@ -84,7 +84,7 @@ async def test_spotify_operations():
         # Test playback control (only if device available)
         print("\n[6/6] Testing playback controls...")
         devices_result = await agent.get_devices()
-        if devices_result.get('devices') and len(devices_result['devices']) > 0:
+        if devices_result.get("devices") and len(devices_result["devices"]) > 0:
             print("  ℹ Devices available, but skipping playback control test")
             print("  ℹ To test playback control, use the agent interactively")
             print("\n  Demo commands you can try:")
@@ -108,6 +108,7 @@ async def test_spotify_operations():
     except Exception as e:
         print(f"\n✗ Test failed with error: {e}", file=sys.stderr)
         import traceback
+
         traceback.print_exc()
         return 1
     finally:

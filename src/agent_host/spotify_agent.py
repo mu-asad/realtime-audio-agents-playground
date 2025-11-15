@@ -36,6 +36,7 @@ class SpotifyAgentHost:
         """Connect to the Spotify MCP server."""
         # Get the path to the MCP server directory
         import pathlib
+
         repo_root = pathlib.Path(__file__).parent.parent.parent
         mcp_server_dir = repo_root / "spotify-mcp-server"
         server_script = mcp_server_dir / "server.js"
@@ -87,12 +88,13 @@ class SpotifyAgentHost:
             init_result = await asyncio.wait_for(self.session.initialize(), timeout=30.0)
             print(f"Session initialized successfully: {init_result}")
         except asyncio.TimeoutError as e:
-            print(f"Timeout error during initialization")
+            print("Timeout error during initialization")
             raise RuntimeError(
                 "Timeout while initializing MCP session. "
                 "The MCP server may not be responding. Check that:\n"
                 "1. Node.js is installed and accessible\n"
-                "2. MCP server dependencies are installed (run 'npm install' in spotify-mcp-server/)\n"
+                "2. MCP server dependencies are installed "
+                "(run 'npm install' in spotify-mcp-server/)\n"
                 "3. Spotify credentials are valid in .env file"
             ) from e
         except Exception as e:
@@ -123,13 +125,17 @@ class SpotifyAgentHost:
             else:
                 name = getattr(tool, "name", None) or getattr(tool, "displayName", None)
                 description = getattr(tool, "description", "")
-                input_schema = getattr(tool, "inputSchema", None) or getattr(tool, "input_schema", None)
+                input_schema = getattr(tool, "inputSchema", None) or getattr(
+                    tool, "input_schema", None
+                )
 
-            tools_list.append({
-                "name": name,
-                "description": description,
-                "input_schema": input_schema,
-            })
+            tools_list.append(
+                {
+                    "name": name,
+                    "description": description,
+                    "input_schema": input_schema,
+                }
+            )
 
         return tools_list
 
@@ -167,10 +173,13 @@ class SpotifyAgentHost:
         play: bool = True,
     ) -> Dict[str, Any]:
         """Transfer playback to a specific device."""
-        return await self.call_tool("spotify_transfer_playback", {
-            "device_id": device_id,
-            "play": play,
-        })
+        return await self.call_tool(
+            "spotify_transfer_playback",
+            {
+                "device_id": device_id,
+                "play": play,
+            },
+        )
 
     async def play(
         self,
@@ -223,10 +232,13 @@ class SpotifyAgentHost:
         limit: int = 10,
     ) -> Dict[str, Any]:
         """Search for tracks on Spotify."""
-        return await self.call_tool("spotify_search_tracks", {
-            "query": query,
-            "limit": limit,
-        })
+        return await self.call_tool(
+            "spotify_search_tracks",
+            {
+                "query": query,
+                "limit": limit,
+            },
+        )
 
     async def get_current_playback(self) -> Dict[str, Any]:
         """Get current playback state."""
