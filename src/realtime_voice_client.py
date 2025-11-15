@@ -1,7 +1,7 @@
 """
-Realtime Voice Client for Azure GPT Realtime API
+Realtime Voice Client for OpenAI Realtime API
 
-This module provides a client for streaming audio to Azure GPT Realtime API
+This module provides a client for streaming audio to OpenAI Realtime API
 and receiving audio and text responses.
 """
 
@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 class RealtimeVoiceClient:
     """
-    Client for Azure GPT Realtime API with audio streaming support.
+    Client for OpenAI Realtime API with audio streaming support.
 
     Handles WebSocket connection, audio input/output, and event processing.
     """
@@ -36,21 +36,19 @@ class RealtimeVoiceClient:
 
         Args:
             config: Configuration dictionary containing:
-                - endpoint: Azure OpenAI endpoint URL
-                - api_key: Azure OpenAI API key
-                - deployment: Deployment/model name
-                - api_version: API version (default: 2024-10-01-preview)
+                - api_key: OpenAI API key
+                - model: Model name (e.g., "gpt-4o-realtime-preview-2024-10-01")
                 - sample_rate: Audio sample rate (default: 16000)
                 - device_index: Optional audio device index
                 - system_prompt: System prompt for the model
+                - speech_speed: Speech speed multiplier (default: 1.0, range: 0.25 to 4.0)
         """
-        self.endpoint = config["endpoint"]
         self.api_key = config["api_key"]
-        self.deployment = config["deployment"]
-        self.api_version = config.get("api_version", "2024-10-01-preview")
+        self.model = config.get("model", "gpt-4o-realtime-preview-2024-10-01")
         self.sample_rate = config.get("sample_rate", 16000)
         self.device_index = config.get("device_index")
         self.system_prompt = config.get("system_prompt", "You are a helpful assistant.")
+        self.speech_speed = config.get("speech_speed", 1.0)
 
         self.ws: Optional[websockets.WebSocketClientProtocol] = None
         self.audio: Optional[pyaudio.PyAudio] = None
@@ -78,25 +76,16 @@ class RealtimeVoiceClient:
         self.transcript_callback = callback
 
     async def connect(self):
-        """Establish WebSocket connection to Azure Realtime API."""
-        # Build WebSocket URL
-        ws_url = (
-            f"{self.endpoint}/openai/realtime"
-            f"?api-version={self.api_version}"
-            f"&deployment={self.deployment}"
-        )
-
-        # Replace http(s) with ws(s)
-        if ws_url.startswith("https://"):
-            ws_url = ws_url.replace("https://", "wss://")
-        elif ws_url.startswith("http://"):
-            ws_url = ws_url.replace("http://", "ws://")
+        """Establish WebSocket connection to OpenAI Realtime API."""
+        # OpenAI Realtime API WebSocket URL
+        ws_url = f"wss://api.openai.com/v1/realtime?model={self.model}"
 
         logger.info(f"Connecting to {ws_url}")
 
-        # Connect with API key in header
+        # Connect with Bearer token authentication
         headers = {
-            "api-key": self.api_key,
+            "Authorization": f"Bearer {self.api_key}",
+            "OpenAI-Beta": "realtime=v1",
         }
 
         try:
@@ -127,6 +116,7 @@ class RealtimeVoiceClient:
                     "prefix_padding_ms": 300,
                     "silence_duration_ms": 500,
                 },
+                "rate": self.speech_speed,  # Speech speed: 0.25 to 4.0 (1.0 is normal speed)
             },
         }
 

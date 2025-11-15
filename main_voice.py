@@ -68,9 +68,7 @@ def print_transcript(role: str, text: str):
 def validate_config():
     """Validate required configuration is present."""
     required_vars = [
-        "AZURE_OPENAI_ENDPOINT",
-        "AZURE_OPENAI_API_KEY",
-        "AZURE_OPENAI_DEPLOYMENT",
+        "OPENAI_API_KEY",
     ]
 
     missing = []
@@ -91,7 +89,7 @@ def validate_config():
 async def main():
     """Main entry point for the voice client."""
     print(f"{Fore.CYAN}{'='*60}{Style.RESET_ALL}")
-    print(f"{Fore.CYAN}Azure GPT Realtime Voice Chat{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}OpenAI Realtime Voice Chat{Style.RESET_ALL}")
     print(f"{Fore.CYAN}{'='*60}{Style.RESET_ALL}\n")
 
     # Validate configuration
@@ -104,11 +102,10 @@ async def main():
 
     # Build configuration
     config = {
-        "endpoint": os.getenv("AZURE_OPENAI_ENDPOINT"),
-        "api_key": os.getenv("AZURE_OPENAI_API_KEY"),
-        "deployment": os.getenv("AZURE_OPENAI_DEPLOYMENT"),
-        "api_version": os.getenv("AZURE_OPENAI_API_VERSION", "2024-10-01-preview"),
+        "api_key": os.getenv("OPENAI_API_KEY"),
+        "model": os.getenv("OPENAI_MODEL", "gpt-4o-realtime-preview-2024-10-01"),
         "sample_rate": int(os.getenv("VOICE_CLIENT_SAMPLE_RATE", "16000")),
+        "speech_speed": float(os.getenv("VOICE_CLIENT_SPEECH_SPEED", "1.0")),
         "system_prompt": system_prompt,
     }
 
