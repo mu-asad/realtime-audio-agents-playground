@@ -100,7 +100,7 @@ class RealtimeVoiceClient:
         }
 
         try:
-            self.ws = await websockets.connect(ws_url, extra_headers=headers)
+            self.ws = await websockets.connect(ws_url, additional_headers=headers)
             logger.info("WebSocket connection established")
 
             # Send session configuration
