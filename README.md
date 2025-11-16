@@ -299,9 +299,56 @@ cd google-calendar-mcp-server && npm run lint
 cd spotify-mcp-server && npm run lint
 ```
 
+## Troubleshooting
+
+### Connection Issues
+
+**Problem:** MCP server connection fails
+
+**Solution:**
+1. Verify Node.js dependencies are installed:
+   ```bash
+   cd google-calendar-mcp-server && npm install
+   cd spotify-mcp-server && npm install
+   ```
+2. Check that Node.js version is 18 or higher: `node --version`
+3. Verify environment variables are set: `python scripts/check_env.py`
+
+### Authentication Errors
+
+**Problem:** "Invalid credentials" or "Unauthorized" errors
+
+**Solution:**
+1. Verify credentials in `.env` file are correct
+2. Regenerate refresh tokens:
+   ```bash
+   # For Google Calendar
+   cd google-calendar-mcp-server && node get-refresh-token.js
+   
+   # For Spotify
+   cd spotify-mcp-server && node get-refresh-token.js
+   ```
+3. Ensure required APIs are enabled in respective consoles
+
+### No Events/Devices Found
+
+**Problem:** Calendar or Spotify returns empty results
+
+**Solution:**
+1. Check that you have events/devices in your actual Google Calendar or Spotify account
+2. Verify the correct calendar ID is set (default: "primary")
+3. For Spotify, ensure you have an active device (open Spotify on your phone/computer)
+
+For more help, see:
+- [Google Calendar Setup](docs/GOOGLE_CALENDAR_SETUP.md)
+- [Spotify Setup](docs/SPOTIFY_SETUP.md)
+- [Contributing Guide](CONTRIBUTING.md)
+
 ## Contributing
 
-Contributions are welcome! This is a playground project for experimenting with Azure Realtime Audio and MCP integrations.
+Contributions are welcome! This is a playground project for experimenting with realtime audio and MCP integrations.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ## License
 
