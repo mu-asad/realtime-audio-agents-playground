@@ -1,4 +1,6 @@
 import asyncio
+import io
+
 import pyaudio
 from agents.realtime import RealtimeAgent, RealtimeRunner
 from colorama import Fore, Style, init
@@ -106,10 +108,11 @@ async def main():
 
     print(f"{Fore.CYAN}Total tools available: {len(tools)}{Style.RESET_ALL}\n")
 
+    # text = io.FileIO.readlines()
     agent = RealtimeAgent(
         tools=tools,
         name="Assistant",
-        instructions="You are a helpful voice assistant with access to Google Calendar and Spotify. Keep responses brief and conversational.",
+        instructions="You are a helpful voice assistant with access to Google Calendar and Spotify. Keep responses brief and conversational. make your responses rhyme.",
     )
 
     runner = RealtimeRunner(
@@ -121,9 +124,10 @@ async def main():
                 "speed" : 1.5,
                 "modalities": ["audio"],
                 "language": "en-US",
+                "system"
                 "input_audio_format": "pcm16",
                 "output_audio_format": "pcm16",
-                "input_audio_transcription": {"model": "gpt-4o-mini-transcribe"},
+                "input_audio_transcription": {"model": "gpt-4o-mini-transcribe", "language": "en"},
                 "turn_detection": {"type": "semantic_vad", "interrupt_response": True},
             }
         },
