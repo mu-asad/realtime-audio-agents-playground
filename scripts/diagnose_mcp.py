@@ -11,7 +11,7 @@ from pathlib import Path
 async def test_node_server():
     """Test if the Node.js server can start."""
     repo_root = Path(__file__).parent.parent
-    server_script = repo_root / "mcp-server" / "server.js"
+    server_script = repo_root / "google-calendar-mcp-server" / "server.js"
 
     print(f"Testing MCP server at: {server_script}")
 
@@ -75,8 +75,8 @@ async def test_node_server():
 async def check_mcp_dependencies():
     """Check if MCP server dependencies are installed."""
     repo_root = Path(__file__).parent.parent
-    node_modules = repo_root / "mcp-server" / "node_modules"
-    package_json = repo_root / "mcp-server" / "package.json"
+    node_modules = repo_root / "google-calendar-mcp-server" / "node_modules"
+    package_json = repo_root / "google-calendar-mcp-server" / "package.json"
 
     print("\nChecking MCP server dependencies...")
 
@@ -88,7 +88,7 @@ async def check_mcp_dependencies():
 
     if not node_modules.exists():
         print("❌ node_modules not found")
-        print("   Run: cd mcp-server && npm install")
+        print("   Run: cd google-calendar-mcp-server && npm install")
         return False
 
     print("✓ node_modules exists")

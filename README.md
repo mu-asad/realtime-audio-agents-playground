@@ -34,7 +34,7 @@ A sandbox for experimenting with live audio (mic → Azure Realtime → audio/te
 3. Install Node.js dependencies for the MCP servers:
    ```bash
    # Google Calendar MCP server
-   cd mcp-server
+   cd google-calendar-mcp-server
    npm install
    cd ..
    
@@ -126,8 +126,9 @@ azure-realtime-audio-playground/
 ├── examples/                      # Example scripts
 │   ├── test_calendar.py          # Calendar integration tests
 │   └── test_spotify.py           # Spotify integration tests
-├── mcp-server/                    # Google Calendar MCP server
+├── google-calendar-mcp-server/    # Google Calendar MCP server
 │   ├── server.js                 # MCP server implementation
+│   ├── get-refresh-token.js      # Token generation helper
 │   └── package.json              # Node.js dependencies
 ├── spotify-mcp-server/            # Spotify MCP server
 │   ├── server.js                 # Spotify MCP implementation
@@ -267,7 +268,7 @@ black src/ examples/
 ruff check src/ examples/
 
 # Node.js code (if needed)
-cd mcp-server && npm run lint
+cd google-calendar-mcp-server && npm run lint
 ```
 
 ## Contributing

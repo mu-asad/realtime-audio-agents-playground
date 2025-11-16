@@ -130,7 +130,7 @@ pip install -r requirements.txt
 #### Node.js Dependencies
 
 ```bash
-cd mcp-server
+cd google-calendar-mcp-server
 npm install
 cd ..
 ```
@@ -329,7 +329,7 @@ To disable the Google Calendar integration:
 ### "Node not found" error
 
 - Make sure Node.js 18+ is installed: `node --version`
-- Check that the MCP server dependencies are installed: `cd mcp-server && npm install`
+- Check that the MCP server dependencies are installed: `cd google-calendar-mcp-server && npm install`
 
 ### "Connection refused" error
 

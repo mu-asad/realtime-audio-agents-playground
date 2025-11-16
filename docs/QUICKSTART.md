@@ -19,8 +19,7 @@ cd azure-realtime-audio-playground
 pip install -r requirements.txt
 
 # Install Node.js dependencies
-cd mcp-server && npm install && cd ..
-cd scripts && npm install && cd ..
+cd google-calendar-mcp-server && npm install && cd ..
 ```
 
 ## Step 2: Set Up Google Calendar API (5-10 minutes)
@@ -63,7 +62,7 @@ GOOGLE_CALENDAR_ID=primary
 ## Step 3: Get Refresh Token (2 minutes)
 
 ```bash
-cd scripts
+cd google-calendar-mcp-server
 node get-refresh-token.js
 ```
 
@@ -156,11 +155,11 @@ asyncio.run(main())
 - Make sure you copied them correctly to `.env`
 
 ### "Refresh token invalid"
-- Run `node scripts/get-refresh-token.js` again
+- Run `node google-calendar-mcp-server/get-refresh-token.js` again
 - Make sure you complete the full OAuth flow
 
 ### "Connection refused"
-- Verify Node.js dependencies are installed: `cd mcp-server && npm install`
+- Verify Node.js dependencies are installed: `cd google-calendar-mcp-server && npm install`
 - Check that Node.js 18+ is installed: `node --version`
 
 ### No events found

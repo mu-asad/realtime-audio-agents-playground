@@ -27,14 +27,16 @@ python scripts/verify_setup.py
 - Before running tests
 - When troubleshooting issues
 
-### 2. `get-refresh-token.js`
+### 2. `get-refresh-token.js` (Moved)
+
+**Note:** This script has been moved to `google-calendar-mcp-server/get-refresh-token.js`.
 
 Interactive script to obtain a Google OAuth refresh token.
 
 **Usage:**
 ```bash
 # First, add your CLIENT_ID and CLIENT_SECRET to .env
-cd scripts
+cd google-calendar-mcp-server
 npm install  # Only needed the first time
 node get-refresh-token.js
 ```
@@ -66,7 +68,7 @@ cp .env.example .env
 # Edit .env and add your CLIENT_ID and CLIENT_SECRET
 
 # Step 2: Get refresh token
-cd scripts
+cd google-calendar-mcp-server
 npm install
 node get-refresh-token.js
 
@@ -93,10 +95,7 @@ Make sure you've installed all dependencies:
 pip install -r requirements.txt
 
 # Node.js dependencies for MCP server
-cd mcp-server && npm install
-
-# Node.js dependencies for scripts
-cd scripts && npm install
+cd google-calendar-mcp-server && npm install
 ```
 
 ### "Invalid credentials" error
@@ -108,7 +107,7 @@ cd scripts && npm install
 ### "Refresh token not working" error
 
 Refresh tokens can be revoked or expired. Get a new one:
-1. Run `node scripts/get-refresh-token.js` again
+1. Run `node google-calendar-mcp-server/get-refresh-token.js` again
 2. Make sure you see the consent screen (use `prompt: 'consent'`)
 3. Copy the new refresh token to `.env`
 
@@ -124,6 +123,7 @@ To add new scripts:
 ## Files in This Directory
 
 - `verify_setup.py` - Verification script for checking installation
-- `get-refresh-token.js` - OAuth helper for getting refresh token
-- `package.json` - Node.js dependencies for scripts
+- `check_env.py` - Check environment variables
+- `diagnose_mcp.py` - Diagnose MCP server issues
+- `test_mcp_direct.py` - Test MCP connection directly
 - `README.md` - This file

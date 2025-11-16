@@ -17,7 +17,7 @@ async def test_mcp_direct():
 
     # Get server path
     repo_root = Path(__file__).parent.parent
-    server_script = repo_root / "mcp-server" / "server.js"
+    server_script = repo_root / "google-calendar-mcp-server" / "server.js"
 
     print(f"Server script: {server_script}")
     print(f"Exists: {server_script.exists()}")
@@ -72,7 +72,7 @@ async def test_mcp_direct():
         print(f"\n❌ Timeout during initialization")
         print("The MCP server is not responding to the initialize request.")
         print("\nPossible causes:")
-        print("1. MCP server dependencies not installed (run: cd mcp-server && npm install)")
+        print("1. MCP server dependencies not installed (run: cd google-calendar-mcp-server && npm install)")
         print("2. Wrong MCP SDK version compatibility")
         print("3. Server crashed on startup (check for stderr output above)")
         return False

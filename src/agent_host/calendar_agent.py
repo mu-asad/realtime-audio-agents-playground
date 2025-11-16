@@ -37,7 +37,7 @@ class CalendarAgentHost:
         # Get the path to the MCP server directory
         import pathlib
         repo_root = pathlib.Path(__file__).parent.parent.parent
-        mcp_server_dir = repo_root / "mcp-server"
+        mcp_server_dir = repo_root / "google-calendar-mcp-server"
         server_script = mcp_server_dir / "server.js"
 
         if not server_script.exists():
@@ -92,7 +92,7 @@ class CalendarAgentHost:
                 "Timeout while initializing MCP session. "
                 "The MCP server may not be responding. Check that:\n"
                 "1. Node.js is installed and accessible\n"
-                "2. MCP server dependencies are installed (run 'npm install' in mcp-server/)\n"
+                "2. MCP server dependencies are installed (run 'npm install' in google-calendar-mcp-server/)\n"
                 "3. Google credentials are valid in .env file"
             ) from e
         except Exception as e:

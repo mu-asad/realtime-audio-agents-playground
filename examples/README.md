@@ -60,7 +60,7 @@ python examples/advanced_examples.py
    pip install -r requirements.txt
    
    # Node.js dependencies (for MCP server)
-   cd mcp-server && npm install && cd ..
+   cd google-calendar-mcp-server && npm install && cd ..
    ```
 
 2. **Set up credentials:**

@@ -24,7 +24,7 @@ self.read, self.write = await self._stdio_cm.__aenter__()
 - **Fixed path resolution**: Use absolute paths to the MCP server script
 - **Added NODE_PATH**: Set NODE_PATH environment variable to help Node.js find modules
 
-### 2. Fixed `mcp-server/server.js`
+### 2. Fixed `google-calendar-mcp-server/server.js`
 - **Added path utilities**: Import `fileURLToPath`, `dirname`, and `join` for proper path handling
 - **Improved dotenv loading**: Try multiple locations for .env file:
   - Parent directory (`../env`)
@@ -51,8 +51,8 @@ python3 examples/test_calendar.py
 ## Expected Output (Success)
 ```
 Starting MCP server process...
-[DEBUG] Working directory: /path/to/mcp-server
-[DEBUG] Server directory: /path/to/mcp-server
+[DEBUG] Working directory: /path/to/google-calendar-mcp-server
+[DEBUG] Server directory: /path/to/google-calendar-mcp-server
 [DEBUG] GOOGLE_CLIENT_ID set: true
 [DEBUG] GOOGLE_REFRESH_TOKEN set: true
 MCP server process started
@@ -77,13 +77,13 @@ Available tools: ['list_events', 'get_event', 'create_event', 'update_event', 'd
    
 2. Verify Node.js and dependencies are installed:
    ```bash
-   cd mcp-server
+   cd google-calendar-mcp-server
    npm install
    ```
 
 3. Test the MCP server directly:
    ```bash
-   cd mcp-server
+   cd google-calendar-mcp-server
    node server.js
    ```
    It should print "Google Calendar MCP Server running on stdio"
