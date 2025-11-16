@@ -155,9 +155,9 @@ async def main():
     try:
         speed = float(os.getenv("VOICE_CLIENT_SPEECH_SPEED", "1.5"))
     except ValueError:
-        speed = 1.5
+        speed = 1.1
 
-    language = "en-US"  # Fixed for now, can be made configurable later
+    language = "en"  # Fixed for now, can be made configurable later
     input_audio_format = os.getenv("VOICE_CLIENT_INPUT_AUDIO_FORMAT", "pcm16")
     output_audio_format = os.getenv("VOICE_CLIENT_OUTPUT_AUDIO_FORMAT", "pcm16")
 
@@ -199,7 +199,7 @@ async def main():
                 "language": language,
                 "input_audio_format": input_audio_format,
                 "output_audio_format": output_audio_format,
-                "input_audio_transcription": {"model": transcription_model} if transcription_enabled else None,
+                "input_audio_transcription": {"model": transcription_model, "language" : language} if transcription_enabled else None,
                 "turn_detection": {
                     "type": turn_type,
                     "threshold": turn_threshold,
