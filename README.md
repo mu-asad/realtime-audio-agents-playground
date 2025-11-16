@@ -129,7 +129,6 @@ realtime-audio-agents-playground/
 │   └── README.md                 # Scripts documentation
 ├── .env.example                   # Environment variables template
 ├── openai-agent.py                # Main voice agent with integrations
-├── run_agent.py                  # Quick start CLI wrapper
 ├── pyproject.toml                # Python project configuration
 ├── requirements.txt              # Python dependencies
 └── README.md                     # This file
@@ -175,20 +174,6 @@ Run the integrated voice agent:
 python openai-agent.py
 ```
 
-Or use the CLI wrapper with options:
-```bash
-# Choose voice
-python run_agent.py --voice coral
-
-# Adjust speed
-python run_agent.py --speed 1.2
-
-# Disable integrations
-python run_agent.py --no-calendar --no-spotify
-
-# Debug mode
-python run_agent.py --debug
-```
 
 ### Calendar Agent (Programmatic)
 

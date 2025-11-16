@@ -6,6 +6,7 @@ allowing voice control of calendar events and music playback.
 """
 
 import asyncio
+import os
 
 import pyaudio
 from agents.realtime import RealtimeAgent, RealtimeRunner
@@ -66,7 +67,7 @@ def _truncate_str(s: str, max_length: int) -> str:
 def print_transcript(role: str, text: str):
     """Print transcript with color coding."""
     if role == "user":
-        print(f"{Fore.GREEN}[USER]: {text}{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}[Asad]: {text}{Style.RESET_ALL}")
     elif role == "assistant":
         print(f"{Fore.BLUE}[ASSISTANT]: {text}{Style.RESET_ALL}")
     else:
@@ -109,6 +110,29 @@ async def main():
     print(f"{Fore.CYAN}OpenAI Realtime Agent with Calendar & Spotify Integration{Style.RESET_ALL}")
     print(f"{Fore.CYAN}{'='*70}{Style.RESET_ALL}\n")
 
+    # Load agent instructions from prompt file
+    prompt_file = "prompts/DHA-ONE.md"
+    try:
+        with open(prompt_file, "r", encoding="utf-8") as f:
+            agent_instructions = f.read()
+        print(f"{Fore.GREEN}✓ Loaded instructions from {prompt_file}{Style.RESET_ALL}")
+    except FileNotFoundError:
+        print(f"{Fore.RED}✗ Could not find {prompt_file}, using default instructions{Style.RESET_ALL}")
+        agent_instructions = (
+            "You are a helpful voice assistant with access to calendar and music controls.\n"
+            "\n"
+            "You can help users with:\n"
+            "- Managing their calendar (viewing events, creating new events, "
+            "updating events, deleting events)\n"
+            "- Controlling Spotify music playback (play, pause, skip, search for songs, "
+            "check what's playing)\n"
+            "\n"
+            "When users ask about their schedule or to create events, use the calendar tools.\n"
+            "When users ask to play music or control playback, use the Spotify tools.\n"
+            "\n"
+            "Keep responses brief and conversational. Always confirm actions before executing them."
+        )
+
     # Initialize MCP agents
     await initialize_mcp_agents()
 
@@ -125,44 +149,62 @@ async def main():
 
     print(f"{Fore.CYAN}Total tools available: {len(tools)}{Style.RESET_ALL}\n")
 
-    # Create agent with enhanced instructions
+    # Runtime configuration from environment
+    model_name = os.getenv("OPENAI_MODEL", "gpt-4o-realtime-preview-2024-10-01")
+    voice = os.getenv("VOICE_CLIENT_VOICE", "ash")
+    try:
+        speed = float(os.getenv("VOICE_CLIENT_SPEECH_SPEED", "1.5"))
+    except ValueError:
+        speed = 1.1
+
+    language = "en"  # Fixed for now, can be made configurable later
+    input_audio_format = os.getenv("VOICE_CLIENT_INPUT_AUDIO_FORMAT", "pcm16")
+    output_audio_format = os.getenv("VOICE_CLIENT_OUTPUT_AUDIO_FORMAT", "pcm16")
+
+    # Transcription settings
+    transcription_enabled = os.getenv("VOICE_CLIENT_TRANSCRIPTION_ENABLED", "true").lower() == "true"
+    transcription_model = os.getenv("VOICE_CLIENT_TRANSCRIPTION_MODEL", "whisper-1")
+
+    # VAD / turn detection settings
+    turn_type = "server_vad"  # Fixed for now
+    try:
+        turn_threshold = float(os.getenv("VOICE_CLIENT_VAD_THRESHOLD", "0.5"))
+    except ValueError:
+        turn_threshold = 0.5
+    try:
+        prefix_padding_ms = int(os.getenv("VOICE_CLIENT_VAD_PREFIX_PADDING_MS", "300"))
+    except ValueError:
+        prefix_padding_ms = 300
+    try:
+        silence_duration_ms = int(os.getenv("VOICE_CLIENT_VAD_SILENCE_DURATION_MS", "500"))
+    except ValueError:
+        silence_duration_ms = 500
+
+    # Create agent with loaded instructions
     agent = RealtimeAgent(
         tools=tools,
-        name="Assistant",
-        instructions=(
-            "You are a helpful voice assistant with access to calendar and music controls.\n"
-            "\n"
-            "You can help users with:\n"
-            "- Managing their calendar (viewing events, creating new events, "
-            "updating events, deleting events)\n"
-            "- Controlling Spotify music playback (play, pause, skip, search for songs, "
-            "check what's playing)\n"
-            "\n"
-            "When users ask about their schedule or to create events, use the calendar tools.\n"
-            "When users ask to play music or control playback, use the Spotify tools.\n"
-            "\n"
-            "Keep responses brief and conversational. Always confirm actions before executing them."
-        ),
+        name="DHĀWAN",
+        instructions=agent_instructions,
     )
 
-    # Configure runner with tools
+    # Configure runner with tools using env-based config
     runner = RealtimeRunner(
         starting_agent=agent,
         config={
             "model_settings": {
-                "model_name": "gpt-4o-realtime-preview-2024-10-01",
-                "voice": "ash",
-                "speed": 1.5,
+                "model_name": model_name,
+                "voice": voice,
+                "speed": speed,
                 "modalities": ["audio"],
-                "language": "en-US",
-                "input_audio_format": "pcm16",
-                "output_audio_format": "pcm16",
-                "input_audio_transcription": {"model": "whisper-1"},
+                "language": language,
+                "input_audio_format": input_audio_format,
+                "output_audio_format": output_audio_format,
+                "input_audio_transcription": {"model": transcription_model, "language" : language} if transcription_enabled else None,
                 "turn_detection": {
-                    "type": "server_vad",
-                    "threshold": 0.5,
-                    "prefix_padding_ms": 300,
-                    "silence_duration_ms": 500,
+                    "type": turn_type,
+                    "threshold": turn_threshold,
+                    "prefix_padding_ms": prefix_padding_ms,
+                    "silence_duration_ms": silence_duration_ms,
                 },
             }
         },
