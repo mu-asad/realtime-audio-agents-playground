@@ -9,7 +9,7 @@ import asyncio
 import json
 import sys
 from typing import Any, Dict, List, Optional
-
+from agents import Agent, FunctionTool, RunContextWrapper, function_tool
 from dotenv import load_dotenv
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
@@ -248,6 +248,57 @@ class CalendarAgentHost:
             args["timeMax"] = time_max
 
         return await self.call_tool("get_free_busy", args)
+
+    def get_list_events_tool(self):
+        """Get a properly wrapped list_events tool for use with RealtimeAgent."""
+        @function_tool
+        async def list_events_tool(
+            time_min: Optional[str] = None,
+            time_max: Optional[str] = None,
+            max_results: int = 10,
+            query: Optional[str] = None,
+        ) -> Dict[str, Any]:
+            """List calendar events. Can filter by time range and search query.
+
+            Args:
+                time_min: Start time in ISO format (e.g., '2024-01-01T00:00:00Z')
+                time_max: End time in ISO format
+                max_results: Maximum number of events to return (default: 10)
+                query: Search query to filter events
+            """
+            return await self.list_events(time_min, time_max, max_results, query)
+
+        return list_events_tool
+
+    def get_create_event_tool(self):
+        """Get a properly wrapped create_event tool for use with RealtimeAgent."""
+        @function_tool
+        async def create_event(
+                self,
+                summary: str,
+                start_time: str,
+                end_time: Optional[str] = None,
+                description: Optional[str] = None,
+                location: Optional[str] = None,
+                attendees: Optional[List[str]] = None,
+        ) -> Dict[str, Any]:
+            """List calendar events. Can filter by time range and search query.
+
+            Args:
+                time_min: Start time in ISO format (e.g., '2024-01-01T00:00:00Z')
+                time_max: End time in ISO format
+                max_results: Maximum number of events to return (default: 10)
+                query: Search query to filter events
+                :param attendees:
+                :param location:
+                :param summary:
+                :param start_time:
+                :param end_time:
+                :param description:
+            """
+            return await self.list_events(time_min, time_max, max_results, query)
+
+        return list_events_tool
 
     async def close(self):
         """Close the connection to the MCP server and exit any context managers."""
