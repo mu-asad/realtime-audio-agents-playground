@@ -232,7 +232,7 @@ busy_periods = freebusy.get("freeBusy", {}).get("busy", [])
 
 Make sure the MCP server dependencies are installed:
 ```bash
-cd mcp-server && npm install
+cd google-calendar-mcp-server && npm install
 ```
 
 ### "Invalid credentials" error
@@ -244,7 +244,7 @@ Check your `.env` file:
 
 Get a new refresh token if needed:
 ```bash
-cd scripts && node get-refresh-token.js
+cd google-calendar-mcp-server && node get-refresh-token.js
 ```
 
 ### No events found
