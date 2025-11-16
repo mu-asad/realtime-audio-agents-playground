@@ -21,38 +21,29 @@ def main():
         description="Run OpenAI Realtime Agent with optional Calendar and Spotify integration"
     )
     parser.add_argument(
-        "--no-calendar",
-        action="store_true",
-        help="Disable Google Calendar integration"
+        "--no-calendar", action="store_true", help="Disable Google Calendar integration"
     )
-    parser.add_argument(
-        "--no-spotify",
-        action="store_true",
-        help="Disable Spotify integration"
-    )
+    parser.add_argument("--no-spotify", action="store_true", help="Disable Spotify integration")
     parser.add_argument(
         "--voice",
         type=str,
         default="ash",
         choices=["alloy", "echo", "shimmer", "ash", "ballad", "coral", "sage", "verse"],
-        help="Voice to use for the assistant (default: ash)"
+        help="Voice to use for the assistant (default: ash)",
     )
     parser.add_argument(
         "--speed",
         type=float,
         default=1.5,
-        help="Speech speed multiplier (0.25 to 4.0, default: 1.5)"
+        help="Speech speed multiplier (0.25 to 4.0, default: 1.5)",
     )
-    parser.add_argument(
-        "--debug",
-        action="store_true",
-        help="Enable debug logging"
-    )
+    parser.add_argument("--debug", action="store_true", help="Enable debug logging")
 
     args = parser.parse_args()
 
     # Set environment variables based on args
     import os
+
     os.environ["SKIP_CALENDAR"] = "1" if args.no_calendar else "0"
     os.environ["SKIP_SPOTIFY"] = "1" if args.no_spotify else "0"
     os.environ["VOICE_SETTING"] = args.voice
@@ -60,6 +51,7 @@ def main():
 
     if args.debug:
         import logging
+
         logging.basicConfig(level=logging.DEBUG)
 
     print("=" * 70)
@@ -78,9 +70,9 @@ def main():
     try:
         # Dynamic import to use the environment variables
         import importlib.util
+
         spec = importlib.util.spec_from_file_location(
-            "openai_agent",
-            project_root / "openai-agent.py"
+            "openai_agent", project_root / "openai-agent.py"
         )
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -93,10 +85,10 @@ def main():
     except Exception as e:
         print(f"\nError: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 
 
 if __name__ == "__main__":
     main()
-

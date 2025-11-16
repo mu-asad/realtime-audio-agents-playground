@@ -6,6 +6,7 @@ allowing voice control of calendar events and music playback.
 """
 
 import asyncio
+
 import pyaudio
 from agents.realtime import RealtimeAgent, RealtimeRunner
 from colorama import Fore, Style, init
@@ -34,6 +35,7 @@ output_stream = p.open(
 calendar_agent: CalendarAgentHost = None
 spotify_agent: SpotifyAgentHost = None
 
+
 async def mic_stream(session):
     """Stream microphone input to the realtime session."""
     p_mic = pyaudio.PyAudio()
@@ -55,9 +57,11 @@ async def mic_stream(session):
         stream.close()
         p_mic.terminate()
 
+
 def _truncate_str(s: str, max_length: int) -> str:
     """Truncate string to max length."""
     return s if len(s) <= max_length else s[:max_length] + "..."
+
 
 def print_transcript(role: str, text: str):
     """Print transcript with color coding."""
@@ -67,6 +71,7 @@ def print_transcript(role: str, text: str):
         print(f"{Fore.BLUE}[ASSISTANT]: {text}{Style.RESET_ALL}")
     else:
         print(f"[{role.upper()}]: {text}")
+
 
 async def initialize_mcp_agents():
     """Initialize and connect to MCP agents."""
@@ -96,6 +101,7 @@ async def initialize_mcp_agents():
 
     print(f"{Fore.CYAN}MCP agents initialization complete{Style.RESET_ALL}\n")
 
+
 async def main():
     load_dotenv()
 
@@ -110,10 +116,12 @@ async def main():
     tools = []
     if calendar_agent:
         tools.extend(calendar_agent.get_all_tools())
-        print(f"{Fore.GREEN}Added {len(calendar_agent.get_all_tools())} calendar tools{Style.RESET_ALL}")
+        calendar_tools_count = len(calendar_agent.get_all_tools())
+        print(f"{Fore.GREEN}Added {calendar_tools_count} calendar tools{Style.RESET_ALL}")
     if spotify_agent:
         tools.extend(spotify_agent.get_all_tools())
-        print(f"{Fore.GREEN}Added {len(spotify_agent.get_all_tools())} Spotify tools{Style.RESET_ALL}")
+        spotify_tools_count = len(spotify_agent.get_all_tools())
+        print(f"{Fore.GREEN}Added {spotify_tools_count} Spotify tools{Style.RESET_ALL}")
 
     print(f"{Fore.CYAN}Total tools available: {len(tools)}{Style.RESET_ALL}\n")
 
@@ -121,16 +129,20 @@ async def main():
     agent = RealtimeAgent(
         tools=tools,
         name="Assistant",
-        instructions="""You are a helpful voice assistant with access to calendar and music controls.
-
-You can help users with:
-- Managing their calendar (viewing events, creating new events, updating events, deleting events)
-- Controlling Spotify music playback (play, pause, skip, search for songs, check what's playing)
-
-When users ask about their schedule or to create events, use the calendar tools.
-When users ask to play music or control playback, use the Spotify tools.
-
-Keep responses brief and conversational. Always confirm actions before executing them.""",
+        instructions=(
+            "You are a helpful voice assistant with access to calendar and music controls.\n"
+            "\n"
+            "You can help users with:\n"
+            "- Managing their calendar (viewing events, creating new events, "
+            "updating events, deleting events)\n"
+            "- Controlling Spotify music playback (play, pause, skip, search for songs, "
+            "check what's playing)\n"
+            "\n"
+            "When users ask about their schedule or to create events, use the calendar tools.\n"
+            "When users ask to play music or control playback, use the Spotify tools.\n"
+            "\n"
+            "Keep responses brief and conversational. Always confirm actions before executing them."
+        ),
     )
 
     # Configure runner with tools
@@ -150,7 +162,7 @@ Keep responses brief and conversational. Always confirm actions before executing
                     "type": "server_vad",
                     "threshold": 0.5,
                     "prefix_padding_ms": 300,
-                    "silence_duration_ms": 500
+                    "silence_duration_ms": 500,
                 },
             }
         },
@@ -160,7 +172,10 @@ Keep responses brief and conversational. Always confirm actions before executing
 
     async with session:
         print(f"{Fore.GREEN}Session started. Mic streaming enabled.{Style.RESET_ALL}")
-        print(f"{Fore.YELLOW}Speak into your microphone to interact with the assistant.{Style.RESET_ALL}")
+        print(
+            f"{Fore.YELLOW}Speak into your microphone to interact with the "
+            f"assistant.{Style.RESET_ALL}"
+        )
         print(f"{Fore.YELLOW}Press Ctrl+C to exit.{Style.RESET_ALL}\n")
 
         # Start mic stream
@@ -175,14 +190,17 @@ Keep responses brief and conversational. Always confirm actions before executing
                     print(f"{Fore.CYAN}Agent ended: {event.agent.name}{Style.RESET_ALL}")
 
                 elif event.type == "handoff":
-                    print(f"{Fore.YELLOW}Handoff from {event.from_agent.name} to {event.to_agent.name}{Style.RESET_ALL}")
+                    print(
+                        f"{Fore.YELLOW}Handoff from {event.from_agent.name} "
+                        f"to {event.to_agent.name}{Style.RESET_ALL}"
+                    )
 
                 elif event.type == "tool_start":
-                    tool_name = getattr(event.tool, 'name', 'unknown')
+                    tool_name = getattr(event.tool, "name", "unknown")
                     print(f"{Fore.MAGENTA}🔧 Tool started: {tool_name}{Style.RESET_ALL}")
 
                 elif event.type == "tool_end":
-                    tool_name = getattr(event.tool, 'name', 'unknown')
+                    tool_name = getattr(event.tool, "name", "unknown")
                     print(f"{Fore.MAGENTA}✓ Tool completed: {tool_name}{Style.RESET_ALL}")
                     # Print tool output (truncated)
                     output_str = str(event.output)
@@ -191,17 +209,17 @@ Keep responses brief and conversational. Always confirm actions before executing
                     print(f"{Fore.MAGENTA}  Output: {output_str}{Style.RESET_ALL}")
 
                 elif event.type == "conversation.item.input_audio_transcription.completed":
-                    transcript = getattr(event, 'transcript', None)
+                    transcript = getattr(event, "transcript", None)
                     if transcript:
                         print_transcript("user", transcript)
 
                 elif event.type == "response.audio_transcript.delta":
-                    delta = getattr(event, 'delta', None)
+                    delta = getattr(event, "delta", None)
                     if delta:
-                        print(f"{Fore.BLUE}{delta}{Style.RESET_ALL}", end='', flush=True)
+                        print(f"{Fore.BLUE}{delta}{Style.RESET_ALL}", end="", flush=True)
 
                 elif event.type == "response.audio_transcript.done":
-                    transcript = getattr(event, 'transcript', None)
+                    transcript = getattr(event, "transcript", None)
                     if transcript:
                         print()  # New line after deltas
                         print_transcript("assistant", transcript)
@@ -224,7 +242,8 @@ Keep responses brief and conversational. Always confirm actions before executing
                     pass
 
             except Exception as e:
-                print(f"{Fore.RED}Error processing event: {_truncate_str(str(e), 200)}{Style.RESET_ALL}")
+                error_msg = _truncate_str(str(e), 200)
+                print(f"{Fore.RED}Error processing event: {error_msg}{Style.RESET_ALL}")
 
 
 if __name__ == "__main__":
@@ -238,4 +257,3 @@ if __name__ == "__main__":
         output_stream.close()
         p.terminate()
         print(f"{Fore.GREEN}Goodbye!{Style.RESET_ALL}")
-
