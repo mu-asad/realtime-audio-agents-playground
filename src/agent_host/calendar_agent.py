@@ -9,7 +9,7 @@ import asyncio
 import json
 import sys
 from typing import Any, Dict, List, Optional
-
+from agents import function_tool
 from dotenv import load_dotenv
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
@@ -248,6 +248,133 @@ class CalendarAgentHost:
             args["timeMax"] = time_max
 
         return await self.call_tool("get_free_busy", args)
+
+    def get_list_events_tool(self):
+        """Get a properly wrapped list_events tool for use with RealtimeAgent."""
+        @function_tool
+        async def list_events_tool(
+            time_min: Optional[str] = None,
+            time_max: Optional[str] = None,
+            max_results: int = 10,
+            query: Optional[str] = None,
+        ) -> Dict[str, Any]:
+            """List calendar events. Can filter by time range and search query.
+
+            Args:
+                time_min: Start time in ISO format (e.g., '2024-01-01T00:00:00Z')
+                time_max: End time in ISO format
+                max_results: Maximum number of events to return (default: 10)
+                query: Search query to filter events
+            """
+            return await self.list_events(time_min, time_max, max_results, query)
+
+        return list_events_tool
+
+    def get_create_event_tool(self):
+        """Get a properly wrapped create_event tool for use with RealtimeAgent."""
+        @function_tool
+        async def create_event_tool(
+            summary: str,
+            start_time: str,
+            end_time: Optional[str] = None,
+            description: Optional[str] = None,
+            location: Optional[str] = None,
+            attendees: Optional[List[str]] = None,
+        ) -> Dict[str, Any]:
+            """Create a new calendar event.
+
+            Args:
+                summary: Event title/summary
+                start_time: Start time in ISO format (e.g., '2024-01-01T14:00:00Z')
+                end_time: End time in ISO format (optional, defaults to 1 hour after start)
+                description: Event description (optional)
+                location: Event location (optional)
+                attendees: List of attendee email addresses (optional)
+            """
+            return await self.create_event(summary, start_time, end_time, description, location, attendees)
+
+        return create_event_tool
+
+    def get_update_event_tool(self):
+        """Get a properly wrapped update_event tool for use with RealtimeAgent."""
+        @function_tool
+        async def update_event_tool(
+            event_id: str,
+            summary: Optional[str] = None,
+            start_time: Optional[str] = None,
+            end_time: Optional[str] = None,
+            description: Optional[str] = None,
+            location: Optional[str] = None,
+            attendees: Optional[List[str]] = None,
+        ) -> Dict[str, Any]:
+            """Update an existing calendar event.
+
+            Args:
+                event_id: The ID of the event to update
+                summary: New event title/summary (optional)
+                start_time: New start time in ISO format (optional)
+                end_time: New end time in ISO format (optional)
+                description: New event description (optional)
+                location: New event location (optional)
+                attendees: New list of attendee email addresses (optional)
+            """
+            return await self.update_event(event_id, summary, start_time, end_time, description, location, attendees)
+
+        return update_event_tool
+
+    def get_delete_event_tool(self):
+        """Get a properly wrapped delete_event tool for use with RealtimeAgent."""
+        @function_tool
+        async def delete_event_tool(event_id: str) -> Dict[str, Any]:
+            """Delete a calendar event.
+
+            Args:
+                event_id: The ID of the event to delete
+            """
+            return await self.delete_event(event_id)
+
+        return delete_event_tool
+
+    def get_event_tool(self):
+        """Get a properly wrapped get_event tool for use with RealtimeAgent."""
+        @function_tool
+        async def get_event_tool(event_id: str) -> Dict[str, Any]:
+            """Get details of a specific calendar event.
+
+            Args:
+                event_id: The ID of the event to retrieve
+            """
+            return await self.get_event(event_id)
+
+        return get_event_tool
+
+    def get_free_busy_tool(self):
+        """Get a properly wrapped get_free_busy tool for use with RealtimeAgent."""
+        @function_tool
+        async def get_free_busy_tool(
+            time_min: Optional[str] = None,
+            time_max: Optional[str] = None,
+        ) -> Dict[str, Any]:
+            """Get free/busy information for the calendar.
+
+            Args:
+                time_min: Start time in ISO format (e.g., '2024-01-01T00:00:00Z')
+                time_max: End time in ISO format
+            """
+            return await self.get_free_busy(time_min, time_max)
+
+        return get_free_busy_tool
+
+    def get_all_tools(self):
+        """Get all calendar tools for use with RealtimeAgent."""
+        return [
+            self.get_list_events_tool(),
+            self.get_create_event_tool(),
+            self.get_update_event_tool(),
+            self.get_delete_event_tool(),
+            self.get_event_tool(),
+            self.get_free_busy_tool(),
+        ]
 
     async def close(self):
         """Close the connection to the MCP server and exit any context managers."""

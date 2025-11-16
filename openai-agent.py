@@ -1,10 +1,14 @@
 import asyncio
+import io
+
 import pyaudio
 from agents.realtime import RealtimeAgent, RealtimeRunner
 from colorama import Fore, Style, init
 from dotenv import load_dotenv
 import pyaudio
 
+from src.agent_host import CalendarAgentHost
+from src.agent_host.spotify_agent import SpotifyAgentHost
 
 # Initialize colorama
 init()
@@ -61,12 +65,54 @@ def print_transcript(role: str, text: str):
     else:
         print(f"[{role.upper()}]: {text}")
 
+async def initialize_mcp_agents():
+    """Initialize and connect to MCP agents."""
+    global calendar_agent, spotify_agent
+
+    print(f"{Fore.CYAN}Initializing MCP agents...{Style.RESET_ALL}")
+
+    # Initialize Calendar Agent
+    try:
+        print(f"{Fore.YELLOW}Connecting to Google Calendar...{Style.RESET_ALL}")
+        calendar_agent = CalendarAgentHost()
+        await calendar_agent.connect_to_mcp_server()
+        print(f"{Fore.GREEN}✓ Calendar agent connected{Style.RESET_ALL}")
+    except Exception as e:
+        print(f"{Fore.RED}✗ Failed to connect Calendar agent: {e}{Style.RESET_ALL}")
+        calendar_agent = None
+
+    # Initialize Spotify Agent
+    try:
+        print(f"{Fore.YELLOW}Connecting to Spotify...{Style.RESET_ALL}")
+        spotify_agent = SpotifyAgentHost()
+        await spotify_agent.connect_to_mcp_server()
+        print(f"{Fore.GREEN}✓ Spotify agent connected{Style.RESET_ALL}")
+    except Exception as e:
+        print(f"{Fore.RED}✗ Failed to connect Spotify agent: {e}{Style.RESET_ALL}")
+        spotify_agent = None
+
+    print(f"{Fore.CYAN}MCP agents initialization complete{Style.RESET_ALL}\n")
+
 async def main():
     load_dotenv()
+    await initialize_mcp_agents()
 
+    # Collect all tools from both agents
+    tools = []
+    if calendar_agent:
+        tools.extend(calendar_agent.get_all_tools())
+        print(f"{Fore.GREEN}Added {len(calendar_agent.get_all_tools())} calendar tools{Style.RESET_ALL}")
+    if spotify_agent:
+        tools.extend(spotify_agent.get_all_tools())
+        print(f"{Fore.GREEN}Added {len(spotify_agent.get_all_tools())} Spotify tools{Style.RESET_ALL}")
+
+    print(f"{Fore.CYAN}Total tools available: {len(tools)}{Style.RESET_ALL}\n")
+
+    # text = io.FileIO.readlines()
     agent = RealtimeAgent(
+        tools=tools,
         name="Assistant",
-        instructions="You are a helpful voice assistant. Keep responses brief and conversational.",
+        instructions="You are a helpful voice assistant with access to Google Calendar and Spotify. Keep responses brief and conversational. make your responses rhyme.",
     )
 
     runner = RealtimeRunner(
@@ -76,11 +122,12 @@ async def main():
                 "model_name": "gpt-realtime",
                 "voice": "ash",
                 "speed" : 1.5,
-                "modalities": ["audio","text"],
+                "modalities": ["audio"],
                 "language": "en-US",
+                "system"
                 "input_audio_format": "pcm16",
                 "output_audio_format": "pcm16",
-                "input_audio_transcription": {"model": "gpt-4o-mini-transcribe"},
+                "input_audio_transcription": {"model": "gpt-4o-mini-transcribe", "language": "en"},
                 "turn_detection": {"type": "semantic_vad", "interrupt_response": True},
             }
         },

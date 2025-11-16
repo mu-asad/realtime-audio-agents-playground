@@ -4,6 +4,7 @@ A sandbox for experimenting with live audio (mic → Azure Realtime → audio/te
 
 ## Features
 
+- **OpenAI Realtime Voice Agent**: Voice-controlled AI assistant with Calendar and Spotify integration (NEW!)
 - **Azure Realtime Audio Integration**: Connect live audio streams to Azure's realtime services
 - **Google Calendar MCP Integration**: Manage calendar events through the Model Context Protocol (MCP)
 - **Spotify MCP Integration**: Control Spotify playback with natural language commands
