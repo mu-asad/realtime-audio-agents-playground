@@ -94,10 +94,22 @@ async def initialize_mcp_agents():
 async def main():
     load_dotenv()
     await initialize_mcp_agents()
+
+    # Collect all tools from both agents
+    tools = []
+    if calendar_agent:
+        tools.extend(calendar_agent.get_all_tools())
+        print(f"{Fore.GREEN}Added {len(calendar_agent.get_all_tools())} calendar tools{Style.RESET_ALL}")
+    if spotify_agent:
+        tools.extend(spotify_agent.get_all_tools())
+        print(f"{Fore.GREEN}Added {len(spotify_agent.get_all_tools())} Spotify tools{Style.RESET_ALL}")
+
+    print(f"{Fore.CYAN}Total tools available: {len(tools)}{Style.RESET_ALL}\n")
+
     agent = RealtimeAgent(
-        tools=[calendar_agent.get_list_events_tool(), calendar_agent.get_create_event_tool()],
+        tools=tools,
         name="Assistant",
-        instructions="You are a helpful voice assistant. Keep responses brief and conversational.",
+        instructions="You are a helpful voice assistant with access to Google Calendar and Spotify. Keep responses brief and conversational.",
     )
 
     runner = RealtimeRunner(

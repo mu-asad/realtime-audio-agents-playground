@@ -10,6 +10,7 @@ import json
 import sys
 from typing import Any, Dict, List, Optional
 
+from agents import function_tool
 from dotenv import load_dotenv
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
@@ -243,6 +244,143 @@ class SpotifyAgentHost:
     async def get_current_playback(self) -> Dict[str, Any]:
         """Get current playback state."""
         return await self.call_tool("spotify_get_current_playback", {})
+
+    def get_devices_tool(self):
+        """Get a properly wrapped get_devices tool for use with RealtimeAgent."""
+        @function_tool
+        async def get_devices_tool() -> Dict[str, Any]:
+            """Get list of available Spotify playback devices."""
+            return await self.get_devices()
+
+        return get_devices_tool
+
+    def get_transfer_playback_tool(self):
+        """Get a properly wrapped transfer_playback tool for use with RealtimeAgent."""
+        @function_tool
+        async def transfer_playback_tool(
+            device_id: str,
+            play: bool = True,
+        ) -> Dict[str, Any]:
+            """Transfer playback to a specific device.
+
+            Args:
+                device_id: The ID of the device to transfer playback to
+                play: Whether to start playing immediately (default: True)
+            """
+            return await self.transfer_playback(device_id, play)
+
+        return transfer_playback_tool
+
+    def get_play_tool(self):
+        """Get a properly wrapped play tool for use with RealtimeAgent."""
+        @function_tool
+        async def play_tool(
+            uri: Optional[str] = None,
+            search_query: Optional[str] = None,
+            device_id: Optional[str] = None,
+        ) -> Dict[str, Any]:
+            """Play music by URI or search query.
+
+            Args:
+                uri: Spotify URI to play (e.g., 'spotify:track:...')
+                search_query: Search query to find and play music
+                device_id: The device to play on (optional)
+            """
+            return await self.play(uri, search_query, device_id)
+
+        return play_tool
+
+    def get_pause_tool(self):
+        """Get a properly wrapped pause tool for use with RealtimeAgent."""
+        @function_tool
+        async def pause_tool(device_id: Optional[str] = None) -> Dict[str, Any]:
+            """Pause current playback.
+
+            Args:
+                device_id: The device to pause (optional)
+            """
+            return await self.pause(device_id)
+
+        return pause_tool
+
+    def get_resume_tool(self):
+        """Get a properly wrapped resume tool for use with RealtimeAgent."""
+        @function_tool
+        async def resume_tool(device_id: Optional[str] = None) -> Dict[str, Any]:
+            """Resume playback.
+
+            Args:
+                device_id: The device to resume on (optional)
+            """
+            return await self.resume(device_id)
+
+        return resume_tool
+
+    def get_next_track_tool(self):
+        """Get a properly wrapped next_track tool for use with RealtimeAgent."""
+        @function_tool
+        async def next_track_tool(device_id: Optional[str] = None) -> Dict[str, Any]:
+            """Skip to next track.
+
+            Args:
+                device_id: The device to skip on (optional)
+            """
+            return await self.next_track(device_id)
+
+        return next_track_tool
+
+    def get_previous_track_tool(self):
+        """Get a properly wrapped previous_track tool for use with RealtimeAgent."""
+        @function_tool
+        async def previous_track_tool(device_id: Optional[str] = None) -> Dict[str, Any]:
+            """Go to previous track.
+
+            Args:
+                device_id: The device to go back on (optional)
+            """
+            return await self.previous_track(device_id)
+
+        return previous_track_tool
+
+    def get_search_tracks_tool(self):
+        """Get a properly wrapped search_tracks tool for use with RealtimeAgent."""
+        @function_tool
+        async def search_tracks_tool(
+            query: str,
+            limit: int = 10,
+        ) -> Dict[str, Any]:
+            """Search for tracks on Spotify.
+
+            Args:
+                query: Search query
+                limit: Maximum number of results to return (default: 10)
+            """
+            return await self.search_tracks(query, limit)
+
+        return search_tracks_tool
+
+    def get_current_playback_tool(self):
+        """Get a properly wrapped get_current_playback tool for use with RealtimeAgent."""
+        @function_tool
+        async def get_current_playback_tool() -> Dict[str, Any]:
+            """Get current playback state including what's playing and on which device."""
+            return await self.get_current_playback()
+
+        return get_current_playback_tool
+
+    def get_all_tools(self):
+        """Get all Spotify tools for use with RealtimeAgent."""
+        return [
+            self.get_devices_tool(),
+            self.get_transfer_playback_tool(),
+            self.get_play_tool(),
+            self.get_pause_tool(),
+            self.get_resume_tool(),
+            self.get_next_track_tool(),
+            self.get_previous_track_tool(),
+            self.get_search_tracks_tool(),
+            self.get_current_playback_tool(),
+        ]
 
     async def close(self):
         """Close the connection to the MCP server and exit any context managers."""
