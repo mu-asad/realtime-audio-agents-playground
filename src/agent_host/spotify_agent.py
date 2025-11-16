@@ -34,7 +34,17 @@ class SpotifyAgentHost:
         self._stdio_cm = None
 
     async def connect_to_mcp_server(self):
-        """Connect to the Spotify MCP server."""
+        """
+        Connect to the Spotify MCP server.
+        
+        Initializes the connection to the Spotify MCP server process via stdio transport,
+        creates a client session, and retrieves available tools.
+        
+        Raises:
+            FileNotFoundError: If the MCP server script is not found
+            RuntimeError: If connection or initialization fails
+            asyncio.TimeoutError: If server does not respond within timeout
+        """
         # Get the path to the MCP server directory
         import pathlib
 
@@ -165,7 +175,12 @@ class SpotifyAgentHost:
         return {"error": "No result returned"}
 
     async def get_devices(self) -> Dict[str, Any]:
-        """Get list of available Spotify playback devices."""
+        """
+        Get list of available Spotify playback devices.
+        
+        Returns:
+            Dictionary containing list of available devices
+        """
         return await self.call_tool("spotify_get_devices", {})
 
     async def transfer_playback(
@@ -173,7 +188,16 @@ class SpotifyAgentHost:
         device_id: str,
         play: bool = True,
     ) -> Dict[str, Any]:
-        """Transfer playback to a specific device."""
+        """
+        Transfer playback to a specific device.
+        
+        Args:
+            device_id: Target device ID for playback
+            play: Whether to start playing immediately (default: True)
+            
+        Returns:
+            Dictionary containing transfer confirmation
+        """
         return await self.call_tool(
             "spotify_transfer_playback",
             {
@@ -188,7 +212,17 @@ class SpotifyAgentHost:
         search_query: Optional[str] = None,
         device_id: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """Play music by URI or search query."""
+        """
+        Play music by URI or search query.
+        
+        Args:
+            uri: Spotify URI (track, album, or playlist) to play (optional)
+            search_query: Search query to find and play music (optional)
+            device_id: Device ID to play on (optional, uses active device if not specified)
+            
+        Returns:
+            Dictionary containing playback status
+        """
         args = {}
         if uri:
             args["uri"] = uri
@@ -200,28 +234,60 @@ class SpotifyAgentHost:
         return await self.call_tool("spotify_play", args)
 
     async def pause(self, device_id: Optional[str] = None) -> Dict[str, Any]:
-        """Pause current playback."""
+        """
+        Pause current playback.
+        
+        Args:
+            device_id: Device ID to pause (optional, uses active device if not specified)
+            
+        Returns:
+            Dictionary containing pause confirmation
+        """
         args = {}
         if device_id:
             args["device_id"] = device_id
         return await self.call_tool("spotify_pause", args)
 
     async def resume(self, device_id: Optional[str] = None) -> Dict[str, Any]:
-        """Resume playback."""
+        """
+        Resume playback.
+        
+        Args:
+            device_id: Device ID to resume (optional, uses active device if not specified)
+            
+        Returns:
+            Dictionary containing resume confirmation
+        """
         args = {}
         if device_id:
             args["device_id"] = device_id
         return await self.call_tool("spotify_resume", args)
 
     async def next_track(self, device_id: Optional[str] = None) -> Dict[str, Any]:
-        """Skip to next track."""
+        """
+        Skip to next track.
+        
+        Args:
+            device_id: Device ID to control (optional, uses active device if not specified)
+            
+        Returns:
+            Dictionary containing skip confirmation
+        """
         args = {}
         if device_id:
             args["device_id"] = device_id
         return await self.call_tool("spotify_next_track", args)
 
     async def previous_track(self, device_id: Optional[str] = None) -> Dict[str, Any]:
-        """Go to previous track."""
+        """
+        Go to previous track.
+        
+        Args:
+            device_id: Device ID to control (optional, uses active device if not specified)
+            
+        Returns:
+            Dictionary containing skip confirmation
+        """
         args = {}
         if device_id:
             args["device_id"] = device_id
@@ -232,7 +298,16 @@ class SpotifyAgentHost:
         query: str,
         limit: int = 10,
     ) -> Dict[str, Any]:
-        """Search for tracks on Spotify."""
+        """
+        Search for tracks on Spotify.
+        
+        Args:
+            query: Search query string
+            limit: Maximum number of results to return (default: 10)
+            
+        Returns:
+            Dictionary containing search results
+        """
         return await self.call_tool(
             "spotify_search_tracks",
             {
@@ -242,7 +317,12 @@ class SpotifyAgentHost:
         )
 
     async def get_current_playback(self) -> Dict[str, Any]:
-        """Get current playback state."""
+        """
+        Get current playback state.
+        
+        Returns:
+            Dictionary containing current playback information (track, artist, playing status)
+        """
         return await self.call_tool("spotify_get_current_playback", {})
 
     def get_devices_tool(self):

@@ -18,9 +18,9 @@ Thank you for your interest in contributing! This document provides guidelines f
    # Install Node.js dependencies
    cd google-calendar-mcp-server && npm install && cd ..
    ```
-4. **Verify your setup**:
+3. **Verify your setup**:
    ```bash
-   python scripts/verify_setup.py
+   python scripts/check_env.py
    ```
 
 ## Development Workflow
@@ -38,9 +38,10 @@ Thank you for your interest in contributing! This document provides guidelines f
    ```bash
    # Run tests
    python examples/test_calendar.py
+   python examples/test_spotify.py
    
-   # Run verification
-   python scripts/verify_setup.py
+   # Verify environment
+   python scripts/check_env.py
    ```
 
 4. **Lint and format your code**:
@@ -119,11 +120,14 @@ async def list_events(
 # Basic test suite
 python examples/test_calendar.py
 
+# Spotify tests
+python examples/test_spotify.py
+
 # Advanced examples
 python examples/advanced_examples.py
 
-# Verification
-python scripts/verify_setup.py
+# Environment check
+python scripts/check_env.py
 ```
 
 ### Writing Tests

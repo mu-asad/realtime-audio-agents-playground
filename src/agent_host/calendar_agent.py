@@ -33,7 +33,17 @@ class CalendarAgentHost:
         self._stdio_cm = None
 
     async def connect_to_mcp_server(self):
-        """Connect to the Google Calendar MCP server."""
+        """
+        Connect to the Google Calendar MCP server.
+        
+        Initializes the connection to the MCP server process via stdio transport,
+        creates a client session, and retrieves available tools.
+        
+        Raises:
+            FileNotFoundError: If the MCP server script is not found
+            RuntimeError: If connection or initialization fails
+            asyncio.TimeoutError: If server does not respond within timeout
+        """
         # Get the path to the MCP server directory
         import pathlib
         repo_root = pathlib.Path(__file__).parent.parent.parent
@@ -112,7 +122,12 @@ class CalendarAgentHost:
         print(f"Available tools: {[tool.name for tool in self.available_tools]}")
 
     async def list_tools(self) -> List[Dict[str, Any]]:
-        """List all available calendar tools."""
+        """
+        List all available calendar tools from the MCP server.
+        
+        Returns:
+            List of tool dictionaries containing name, description, and input schema
+        """
         tools_list: List[Dict[str, Any]] = []
         for tool in self.available_tools:
             # Support both object-like and dict-like tool representations
@@ -164,7 +179,18 @@ class CalendarAgentHost:
         max_results: int = 10,
         query: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """List calendar events."""
+        """
+        List calendar events with optional filtering.
+        
+        Args:
+            time_min: Start time for events in ISO 8601 format (e.g., "2025-11-20T00:00:00Z")
+            time_max: End time for events in ISO 8601 format
+            max_results: Maximum number of events to return (default: 10)
+            query: Search query to filter events by text
+            
+        Returns:
+            Dictionary containing list of events and metadata
+        """
         args = {"maxResults": max_results}
         if time_min:
             args["timeMin"] = time_min
@@ -176,7 +202,15 @@ class CalendarAgentHost:
         return await self.call_tool("list_events", args)
 
     async def get_event(self, event_id: str) -> Dict[str, Any]:
-        """Get a specific event by ID."""
+        """
+        Get details of a specific calendar event.
+        
+        Args:
+            event_id: Unique identifier of the event
+            
+        Returns:
+            Dictionary containing event details
+        """
         return await self.call_tool("get_event", {"eventId": event_id})
 
     async def create_event(
@@ -188,7 +222,20 @@ class CalendarAgentHost:
         location: Optional[str] = None,
         attendees: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
-        """Create a new calendar event."""
+        """
+        Create a new calendar event.
+        
+        Args:
+            summary: Event title/summary
+            start_time: Event start time in ISO 8601 format
+            end_time: Event end time in ISO 8601 format (optional)
+            description: Event description (optional)
+            location: Event location (optional)
+            attendees: List of attendee email addresses (optional)
+            
+        Returns:
+            Dictionary containing created event details
+        """
         args = {
             "summary": summary,
             "startTime": start_time,
@@ -214,7 +261,21 @@ class CalendarAgentHost:
         location: Optional[str] = None,
         attendees: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
-        """Update an existing event."""
+        """
+        Update an existing calendar event.
+        
+        Args:
+            event_id: Unique identifier of the event to update
+            summary: New event title (optional)
+            start_time: New start time in ISO 8601 format (optional)
+            end_time: New end time in ISO 8601 format (optional)
+            description: New event description (optional)
+            location: New event location (optional)
+            attendees: New list of attendee email addresses (optional)
+            
+        Returns:
+            Dictionary containing updated event details
+        """
         args = {"eventId": event_id}
         if summary:
             args["summary"] = summary
@@ -232,7 +293,15 @@ class CalendarAgentHost:
         return await self.call_tool("update_event", args)
 
     async def delete_event(self, event_id: str) -> Dict[str, Any]:
-        """Delete an event."""
+        """
+        Delete a calendar event.
+        
+        Args:
+            event_id: Unique identifier of the event to delete
+            
+        Returns:
+            Dictionary containing deletion confirmation
+        """
         return await self.call_tool("delete_event", {"eventId": event_id})
 
     async def get_free_busy(
@@ -240,7 +309,16 @@ class CalendarAgentHost:
         time_min: Optional[str] = None,
         time_max: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """Get free/busy information."""
+        """
+        Get free/busy availability information for a time range.
+        
+        Args:
+            time_min: Start time in ISO 8601 format (optional)
+            time_max: End time in ISO 8601 format (optional)
+            
+        Returns:
+            Dictionary containing free/busy periods
+        """
         args = {}
         if time_min:
             args["timeMin"] = time_min
@@ -377,7 +455,12 @@ class CalendarAgentHost:
         ]
 
     async def close(self):
-        """Close the connection to the MCP server and exit any context managers."""
+        """
+        Close the connection to the MCP server and cleanup resources.
+        
+        Properly exits all async context managers (session and stdio client)
+        to ensure clean shutdown of the MCP server process.
+        """
         # If the session implements __aexit__ (i.e. is an async context manager), exit it.
         if self.session:
             if hasattr(self.session, "__aexit__"):
