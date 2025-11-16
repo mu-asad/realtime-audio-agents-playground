@@ -68,20 +68,23 @@ python examples/advanced_examples.py
    # Copy example config
    cp .env.example .env
    
-   # Add your Google Calendar credentials
-   # See docs/GOOGLE_CALENDAR_SETUP.md for details
+   # Add your Google Calendar and Spotify credentials
+   # See docs/GOOGLE_CALENDAR_SETUP.md and docs/SPOTIFY_SETUP.md for details
    ```
 
-3. **Verify setup:**
+3. **Verify environment:**
    ```bash
-   python scripts/verify_setup.py
+   python scripts/check_env.py
    ```
 
 ### Running Tests
 
 ```bash
-# Run basic tests
+# Run calendar tests
 python examples/test_calendar.py
+
+# Run Spotify tests
+python examples/test_spotify.py
 
 # Run advanced examples
 python examples/advanced_examples.py

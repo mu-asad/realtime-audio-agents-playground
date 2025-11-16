@@ -1,14 +1,14 @@
-# azure-realtime-audio-playground
+# Realtime Audio Agents Playground
 
-A sandbox for experimenting with live audio (mic → Azure Realtime → audio/text back), with minimal assumptions about tech stack.
+A playground for experimenting with realtime audio AI agents, integrating voice control with Google Calendar and Spotify through the Model Context Protocol (MCP).
 
 ## Features
 
-- **OpenAI Realtime Voice Agent**: Voice-controlled AI assistant with Calendar and Spotify integration (NEW!)
-- **Azure Realtime Audio Integration**: Connect live audio streams to Azure's realtime services
-- **Google Calendar MCP Integration**: Manage calendar events through the Model Context Protocol (MCP)
-- **Spotify MCP Integration**: Control Spotify playback with natural language commands
-- **Personal Assistant Agent**: AI-powered assistant with calendar and music control capabilities
+- **OpenAI Realtime Voice Agent**: Voice-controlled AI assistant with natural language processing
+- **Google Calendar Integration**: Manage calendar events through MCP - list, create, update, and delete events
+- **Spotify Integration**: Control Spotify playback with voice commands - play music, control playback, search tracks
+- **MCP Architecture**: Clean separation of concerns using the Model Context Protocol
+- **Flexible Configuration**: Easy to enable/disable integrations as needed
 
 ## Quick Start
 
@@ -18,135 +18,126 @@ A sandbox for experimenting with live audio (mic → Azure Realtime → audio/te
 - Node.js 18 or higher
 - Google Cloud Platform account (for calendar integration, optional)
 - Spotify Premium account (for music playback control, optional)
+- Azure OpenAI or OpenAI API key (for voice agent, optional)
 
 ### Installation
 
-1. Clone the repository:
+1. **Clone the repository:**
    ```bash
-   git clone https://github.com/mu-asad/azure-realtime-audio-playground.git
-   cd azure-realtime-audio-playground
+   git clone https://github.com/mu-asad/realtime-audio-agents-playground.git
+   cd realtime-audio-agents-playground
    ```
 
-2. Install Python dependencies:
+2. **Install Python dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
 
-3. Install Node.js dependencies for the MCP servers:
+3. **Install Node.js dependencies for MCP servers:**
    ```bash
    # Google Calendar MCP server
-   cd google-calendar-mcp-server
-   npm install
-   cd ..
+   cd google-calendar-mcp-server && npm install && cd ..
    
    # Spotify MCP server
-   cd spotify-mcp-server
-   npm install
-   cd ..
+   cd spotify-mcp-server && npm install && cd ..
    ```
 
-4. Configure environment variables:
+4. **Configure environment variables:**
    ```bash
    cp .env.example .env
-   # Edit .env with your credentials
+   # Edit .env with your credentials (see setup guides below)
+   ```
+
+5. **Verify setup:**
+   ```bash
+   python scripts/check_env.py
    ```
 
 ### Google Calendar Integration
 
-The project includes a fully functional Google Calendar integration using the Model Context Protocol (MCP). The agent can:
+The project includes a Google Calendar integration using the Model Context Protocol (MCP).
 
-- ✅ List calendar events for any date range
-- ✅ Get details of specific events
-- ✅ Create new calendar events with attendees
-- ✅ Update existing events (title, time, description, etc.)
-- ✅ Delete/cancel events
-- ✅ Check free/busy availability
+**Capabilities:**
+- List calendar events for any date range
+- Get details of specific events
+- Create new calendar events with attendees
+- Update existing events (title, time, description, etc.)
+- Delete/cancel events
+- Check free/busy availability
 
-#### Setup
+**Setup:**
 
-See [docs/GOOGLE_CALENDAR_SETUP.md](docs/GOOGLE_CALENDAR_SETUP.md) for detailed setup instructions, including:
-- Setting up Google Calendar API credentials
-- Configuring OAuth authentication
-- Getting a refresh token
-- Running the test scripts
+See [docs/GOOGLE_CALENDAR_SETUP.md](docs/GOOGLE_CALENDAR_SETUP.md) for detailed setup instructions.
 
-#### Quick Test
-
+**Quick test:**
 ```bash
-# Run the comprehensive test suite
 python examples/test_calendar.py
 ```
 
-#### Disabling Calendar Integration
-
-If you don't need calendar functionality:
-1. Simply don't run the calendar agent
-2. Skip the Google Calendar setup steps
-3. The project will work without it
+**Disabling:** Simply skip the setup steps if you don't need calendar functionality.
 
 ### Spotify Integration
 
-The project includes Spotify playback control using the Model Context Protocol (MCP). The agent can:
+The project includes Spotify playback control using the Model Context Protocol (MCP).
 
-- ✅ List and select playback devices
-- ✅ Play music by search query or URI
-- ✅ Control playback (play, pause, resume)
-- ✅ Navigate tracks (next, previous)
-- ✅ Search for tracks on Spotify
-- ✅ Get current playback state
+**Capabilities:**
+- List and select playback devices
+- Play music by search query or URI
+- Control playback (play, pause, resume)
+- Navigate tracks (next, previous)
+- Search for tracks on Spotify
+- Get current playback state
 
-#### Setup
+**Setup:**
 
-See [docs/SPOTIFY_SETUP.md](docs/SPOTIFY_SETUP.md) for detailed setup instructions, including:
-- Creating a Spotify app
-- Configuring OAuth credentials
-- Getting a refresh token
-- Running the test scripts
+See [docs/SPOTIFY_SETUP.md](docs/SPOTIFY_SETUP.md) for detailed setup instructions.
 
-#### Quick Test
-
+**Quick test:**
 ```bash
-# Run the Spotify integration test
 python examples/test_spotify.py
 ```
 
-#### Disabling Spotify Integration
-
-If you don't need Spotify functionality:
-1. Simply don't run the Spotify agent
-2. Skip the Spotify setup steps
-3. The project will work without it
+**Disabling:** Simply skip the setup steps if you don't need Spotify functionality.
 
 ## Project Structure
 
 ```
-azure-realtime-audio-playground/
-├── docs/                          # Documentation
-│   ├── GOOGLE_CALENDAR_SETUP.md  # Calendar integration guide
-│   └── SPOTIFY_SETUP.md          # Spotify integration guide
-├── examples/                      # Example scripts
-│   ├── test_calendar.py          # Calendar integration tests
-│   └── test_spotify.py           # Spotify integration tests
-├── google-calendar-mcp-server/    # Google Calendar MCP server
-│   ├── server.js                 # MCP server implementation
-│   ├── get-refresh-token.js      # Token generation helper
-│   └── package.json              # Node.js dependencies
-├── spotify-mcp-server/            # Spotify MCP server
-│   ├── server.js                 # Spotify MCP implementation
-│   ├── get-refresh-token.js      # Token generation helper
-│   └── package.json              # Node.js dependencies
-├── src/                          # Source code
-│   └── agent_host/               # Agent host implementation
-│       ├── calendar_agent.py     # Calendar agent host
-│       ├── spotify_agent.py      # Spotify agent host
-│       └── __init__.py
-├── .env.example                  # Environment variables template
-├── pyproject.toml               # Python project configuration
-├── requirements.txt             # Python dependencies
-└── README.md                    # This file
+realtime-audio-agents-playground/
+├── docs/                           # Documentation
+│   ├── GOOGLE_CALENDAR_SETUP.md   # Calendar integration setup guide
+│   ├── SPOTIFY_SETUP.md           # Spotify integration setup guide
+│   └── AGENT_SYSTEM_INSTRUCTIONS.md # AI agent instructions
+├── examples/                       # Example scripts and tests
+│   ├── test_calendar.py           # Calendar integration test suite
+│   ├── test_spotify.py            # Spotify integration test suite
+│   ├── test_connection.py         # MCP connection test
+│   └── advanced_examples.py       # Advanced usage examples
+├── google-calendar-mcp-server/     # Google Calendar MCP server
+│   ├── server.js                  # MCP server implementation
+│   ├── get-refresh-token.js       # OAuth token generation helper
+│   └── package.json               # Node.js dependencies
+├── spotify-mcp-server/             # Spotify MCP server
+│   ├── server.js                  # Spotify MCP implementation
+│   ├── get-refresh-token.js       # OAuth token generation helper
+│   └── package.json               # Node.js dependencies
+├── src/                           # Python source code
+│   └── agent_host/                # Agent host implementations
+│       ├── calendar_agent.py      # Calendar agent MCP host
+│       └── spotify_agent.py       # Spotify agent MCP host
+├── scripts/                       # Helper scripts
+│   ├── check_env.py              # Environment variable checker
+│   └── README.md                 # Scripts documentation
+├── .env.example                   # Environment variables template
+├── openai-agent-integrated.py    # Main voice agent with integrations
+├── run_agent.py                  # Quick start CLI wrapper
+├── pyproject.toml                # Python project configuration
+├── requirements.txt              # Python dependencies
+└── README.md                     # This file
 ```
 
-## Available Calendar Tools
+## Available Tools
+
+### Calendar Tools
 
 The Calendar MCP server exposes these tools to the agent:
 
@@ -159,7 +150,7 @@ The Calendar MCP server exposes these tools to the agent:
 | `delete_event` | Delete/cancel an event |
 | `get_free_busy` | Get free/busy information |
 
-## Available Spotify Tools
+### Spotify Tools
 
 The Spotify MCP server exposes these tools to the agent:
 
@@ -177,7 +168,29 @@ The Spotify MCP server exposes these tools to the agent:
 
 ## Usage Examples
 
-### Calendar Agent
+### Voice Agent with Integrations
+
+Run the integrated voice agent:
+```bash
+python openai-agent-integrated.py
+```
+
+Or use the CLI wrapper with options:
+```bash
+# Choose voice
+python run_agent.py --voice coral
+
+# Adjust speed
+python run_agent.py --speed 1.2
+
+# Disable integrations
+python run_agent.py --no-calendar --no-spotify
+
+# Debug mode
+python run_agent.py --debug
+```
+
+### Calendar Agent (Programmatic)
 
 ```python
 import asyncio
@@ -206,7 +219,7 @@ async def main():
 asyncio.run(main())
 ```
 
-### Spotify Agent
+### Spotify Agent (Programmatic)
 
 ```python
 import asyncio
@@ -238,17 +251,17 @@ asyncio.run(main())
 
 ## Architecture
 
-The project uses the Model Context Protocol (MCP) to separate concerns:
+The project uses the **Model Context Protocol (MCP)** to separate concerns:
 
 - **Agent Hosts (Python)**: Manage AI agents and orchestrate tool calls
 - **MCP Servers (Node.js)**: Handle external API interactions (Google Calendar, Spotify)
-- **MCP Protocol**: Standardized communication between agents and services
+- **MCP Protocol**: Standardized stdio-based communication between agents and services
 
-This architecture allows for:
+**Benefits:**
 - Easy testing of individual components
-- Swapping out different service providers
-- Adding additional MCP servers for other services
+- Swappable service providers
 - Clear separation of concerns
+- Simple to add new MCP servers for other services
 
 ## Development
 
@@ -258,18 +271,32 @@ This architecture allows for:
 # Test calendar integration
 python examples/test_calendar.py
 
-# Add more tests as the project grows
+# Test Spotify integration
+python examples/test_spotify.py
+
+# Test MCP connections
+python examples/test_connection.py
+
+# Run advanced examples
+python examples/advanced_examples.py
 ```
 
-### Linting
+### Environment Verification
 
 ```bash
-# Python code
+python scripts/check_env.py
+```
+
+### Code Quality
+
+```bash
+# Python code formatting and linting
 black src/ examples/
 ruff check src/ examples/
 
-# Node.js code (if needed)
+# Node.js linting (if applicable)
 cd google-calendar-mcp-server && npm run lint
+cd spotify-mcp-server && npm run lint
 ```
 
 ## Contributing
