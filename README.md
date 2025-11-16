@@ -128,7 +128,7 @@ realtime-audio-agents-playground/
 │   ├── check_env.py              # Environment variable checker
 │   └── README.md                 # Scripts documentation
 ├── .env.example                   # Environment variables template
-├── openai-agent-integrated.py    # Main voice agent with integrations
+├── openai-agent.py                # Main voice agent with integrations
 ├── run_agent.py                  # Quick start CLI wrapper
 ├── pyproject.toml                # Python project configuration
 ├── requirements.txt              # Python dependencies
@@ -172,7 +172,7 @@ The Spotify MCP server exposes these tools to the agent:
 
 Run the integrated voice agent:
 ```bash
-python openai-agent-integrated.py
+python openai-agent.py
 ```
 
 Or use the CLI wrapper with options:
