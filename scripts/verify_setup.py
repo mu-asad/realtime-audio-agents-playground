@@ -51,7 +51,7 @@ def check_node_dependencies():
     """Check if Node.js dependencies are installed."""
     print_header("Checking Node.js Dependencies")
     
-    mcp_server_dir = Path(__file__).parent.parent / "mcp-server"
+    mcp_server_dir = Path(__file__).parent.parent / "google-calendar-mcp-server"
     node_modules = mcp_server_dir / "node_modules"
     
     if node_modules.exists():
@@ -69,7 +69,7 @@ def check_node_dependencies():
         return True
     else:
         print(f"  ✗ node_modules NOT found in {mcp_server_dir}")
-        print("     Run: cd mcp-server && npm install")
+        print("     Run: cd google-calendar-mcp-server && npm install")
         return False
 
 
@@ -77,7 +77,7 @@ def check_mcp_server():
     """Check if MCP server file exists and is valid."""
     print_header("Checking MCP Server")
     
-    server_file = Path(__file__).parent.parent / "mcp-server" / "server.js"
+    server_file = Path(__file__).parent.parent / "google-calendar-mcp-server" / "server.js"
     
     if server_file.exists():
         print(f"  ✓ server.js exists: {server_file}")
@@ -163,7 +163,7 @@ def check_configuration():
         ".env.example",
         "pyproject.toml",
         "requirements.txt",
-        "mcp-server/package.json",
+        "google-calendar-mcp-server/package.json",
     ]
     
     all_exist = True

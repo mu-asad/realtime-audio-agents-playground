@@ -64,7 +64,7 @@ async def close(self):
 - Added helpful error messages
 
 ### 5. Improved MCP Server ✅
-**File:** `mcp-server/server.js`
+**File:** `google-calendar-mcp-server/server.js`
 
 - Added path resolution for .env files
 - Added debug logging
@@ -91,7 +91,7 @@ Run these diagnostic commands in order:
 python3 scripts/check_env.py
 
 # 2. Verify server dependencies
-cd mcp-server && npm install && cd ..
+cd google-calendar-mcp-server && npm install && cd ..
 
 # 3. Test server startup
 python3 scripts/diagnose_mcp.py
@@ -158,7 +158,7 @@ The original async context manager error is still fixed. The timeout means:
 
 ### Modified
 1. `src/agent_host/calendar_agent.py` - Fixed context manager usage
-2. `mcp-server/server.js` - Added debugging and better env loading
+2. `google-calendar-mcp-server/server.js` - Added debugging and better env loading
 
 ### Created
 1. `scripts/check_env.py` - Environment check tool

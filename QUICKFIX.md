@@ -17,7 +17,7 @@ TimeoutError: Timeout while initializing MCP session
 
 ### 1. Install Dependencies
 ```bash
-cd mcp-server
+cd google-calendar-mcp-server
 npm install
 cd ..
 ```
@@ -58,7 +58,7 @@ pip show mcp
 
 **Node.js:**
 ```bash
-cd mcp-server
+cd google-calendar-mcp-server
 npm list @modelcontextprotocol/sdk
 ```
 
@@ -70,7 +70,7 @@ Both should be version `0.5.x` or ensure they use the same protocol version.
 
 ### Manual Server Test
 ```bash
-cd mcp-server
+cd google-calendar-mcp-server
 node server.js
 ```
 

@@ -18,7 +18,7 @@ The MCP server (Node.js) is not responding to the initialization request from th
 node --version
 
 # Install MCP server dependencies
-cd mcp-server
+cd google-calendar-mcp-server
 npm install
 ```
 
@@ -67,7 +67,7 @@ The Python MCP client and Node.js MCP server must use compatible protocol versio
 pip show mcp
 
 # Node.js MCP version
-cd mcp-server
+cd google-calendar-mcp-server
 npm list @modelcontextprotocol/sdk
 ```
 
@@ -85,14 +85,14 @@ Add logging to see server stderr:
 
 **Check server manually:**
 ```bash
-cd mcp-server
+cd google-calendar-mcp-server
 node server.js
 ```
 
 You should see:
 ```
-[DEBUG] Working directory: /path/to/mcp-server
-[DEBUG] Server directory: /path/to/mcp-server  
+[DEBUG] Working directory: /path/to/google-calendar-mcp-server
+[DEBUG] Server directory: /path/to/google-calendar-mcp-server  
 [DEBUG] GOOGLE_CLIENT_ID set: true
 [DEBUG] GOOGLE_REFRESH_TOKEN set: true
 [DEBUG] Creating StdioServerTransport...

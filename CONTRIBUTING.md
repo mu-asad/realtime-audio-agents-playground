@@ -16,8 +16,7 @@ Thank you for your interest in contributing! This document provides guidelines f
    pip install -r requirements.txt
    
    # Install Node.js dependencies
-   cd mcp-server && npm install && cd ..
-   cd scripts && npm install && cd ..
+   cd google-calendar-mcp-server && npm install && cd ..
    ```
 4. **Verify your setup**:
    ```bash
@@ -138,7 +137,7 @@ When adding new features:
 
 ### Adding New Calendar Tools
 
-1. Add the tool definition to `mcp-server/server.js`:
+1. Add the tool definition to `google-calendar-mcp-server/server.js`:
    ```javascript
    {
      name: "new_tool",
