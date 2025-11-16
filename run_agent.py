@@ -79,8 +79,8 @@ def main():
         # Dynamic import to use the environment variables
         import importlib.util
         spec = importlib.util.spec_from_file_location(
-            "integrated_agent",
-            project_root / "openai-agent-integrated.py"
+            "openai_agent",
+            project_root / "openai-agent.py"
         )
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
