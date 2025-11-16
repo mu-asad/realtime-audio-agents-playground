@@ -150,29 +150,33 @@ async def main():
     print(f"{Fore.CYAN}Total tools available: {len(tools)}{Style.RESET_ALL}\n")
 
     # Runtime configuration from environment
-    model_name = os.getenv("REALTIME_MODEL_NAME", "gpt-4o-realtime-preview-2024-10-01")
-    voice = os.getenv("REALTIME_VOICE", "ash")
+    model_name = os.getenv("OPENAI_MODEL", "gpt-4o-realtime-preview-2024-10-01")
+    voice = os.getenv("VOICE_CLIENT_VOICE", "ash")
     try:
-        speed = float(os.getenv("REALTIME_SPEED", "1.5"))
+        speed = float(os.getenv("VOICE_CLIENT_SPEECH_SPEED", "1.5"))
     except ValueError:
         speed = 1.5
 
-    language = os.getenv("REALTIME_LANGUAGE", "en-US")
-    input_audio_format = os.getenv("REALTIME_INPUT_AUDIO_FORMAT", "pcm16")
-    output_audio_format = os.getenv("REALTIME_OUTPUT_AUDIO_FORMAT", "pcm16")
+    language = "en-US"  # Fixed for now, can be made configurable later
+    input_audio_format = os.getenv("VOICE_CLIENT_INPUT_AUDIO_FORMAT", "pcm16")
+    output_audio_format = os.getenv("VOICE_CLIENT_OUTPUT_AUDIO_FORMAT", "pcm16")
+
+    # Transcription settings
+    transcription_enabled = os.getenv("VOICE_CLIENT_TRANSCRIPTION_ENABLED", "true").lower() == "true"
+    transcription_model = os.getenv("VOICE_CLIENT_TRANSCRIPTION_MODEL", "whisper-1")
 
     # VAD / turn detection settings
-    turn_type = os.getenv("REALTIME_TURN_DETECTION_TYPE", "server_vad")
+    turn_type = "server_vad"  # Fixed for now
     try:
-        turn_threshold = float(os.getenv("REALTIME_TURN_DETECTION_THRESHOLD", "0.5"))
+        turn_threshold = float(os.getenv("VOICE_CLIENT_VAD_THRESHOLD", "0.5"))
     except ValueError:
         turn_threshold = 0.5
     try:
-        prefix_padding_ms = int(os.getenv("REALTIME_TURN_PREFIX_PADDING_MS", "300"))
+        prefix_padding_ms = int(os.getenv("VOICE_CLIENT_VAD_PREFIX_PADDING_MS", "300"))
     except ValueError:
         prefix_padding_ms = 300
     try:
-        silence_duration_ms = int(os.getenv("REALTIME_TURN_SILENCE_DURATION_MS", "500"))
+        silence_duration_ms = int(os.getenv("VOICE_CLIENT_VAD_SILENCE_DURATION_MS", "500"))
     except ValueError:
         silence_duration_ms = 500
 
@@ -195,7 +199,7 @@ async def main():
                 "language": language,
                 "input_audio_format": input_audio_format,
                 "output_audio_format": output_audio_format,
-                "input_audio_transcription": {"model": "whisper-1"},
+                "input_audio_transcription": {"model": transcription_model} if transcription_enabled else None,
                 "turn_detection": {
                     "type": turn_type,
                     "threshold": turn_threshold,
